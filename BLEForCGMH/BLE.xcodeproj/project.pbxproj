@@ -1,0 +1,478 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1E52A63C18C57297007AC38D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E52A63B18C57297007AC38D /* Foundation.framework */; };
+		1E52A64118C57297007AC38D /* BLE.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1E52A64018C57297007AC38D /* BLE.h */; };
+		1E52A64318C57297007AC38D /* BLE.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E52A64218C57297007AC38D /* BLE.m */; };
+		1E52A64A18C57297007AC38D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E52A64918C57297007AC38D /* XCTest.framework */; };
+		1E52A64B18C57297007AC38D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E52A63B18C57297007AC38D /* Foundation.framework */; };
+		1E52A64D18C57297007AC38D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E52A64C18C57297007AC38D /* UIKit.framework */; };
+		1E52A65018C57297007AC38D /* libBLE.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E52A63818C57297007AC38D /* libBLE.a */; };
+		1E52A65618C57297007AC38D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1E52A65418C57297007AC38D /* InfoPlist.strings */; };
+		1E52A65818C57297007AC38D /* BLETests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E52A65718C57297007AC38D /* BLETests.m */; };
+		1E56A7C818C5852C0092A759 /* VentilationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E56A7C718C5852C0092A759 /* VentilationData.m */; };
+		1E56A7CB18C586180092A759 /* DeviceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E56A7CA18C586180092A759 /* DeviceInfo.m */; };
+		1EC5675018F386BF0098AF8D /* Hamilton.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EC5674F18F386BF0098AF8D /* Hamilton.m */; };
+		1EC5675D18F63D100098AF8D /* SERVOi.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EC5675C18F63D100098AF8D /* SERVOi.m */; };
+		1EC7FA4518DC163A00C02121 /* DRAGER.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EC7FA4418DC163A00C02121 /* DRAGER.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1E52A64E18C57297007AC38D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1E52A63018C57297007AC38D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1E52A63718C57297007AC38D;
+			remoteInfo = BLE;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1E52A63618C57297007AC38D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				1E52A64118C57297007AC38D /* BLE.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1E52A63818C57297007AC38D /* libBLE.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBLE.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		1E52A63B18C57297007AC38D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1E52A63F18C57297007AC38D /* BLE-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BLE-Prefix.pch"; sourceTree = "<group>"; };
+		1E52A64018C57297007AC38D /* BLE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLE.h; sourceTree = "<group>"; };
+		1E52A64218C57297007AC38D /* BLE.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLE.m; sourceTree = "<group>"; };
+		1E52A64818C57297007AC38D /* BLETests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BLETests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1E52A64918C57297007AC38D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		1E52A64C18C57297007AC38D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		1E52A65318C57297007AC38D /* BLETests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BLETests-Info.plist"; sourceTree = "<group>"; };
+		1E52A65518C57297007AC38D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1E52A65718C57297007AC38D /* BLETests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLETests.m; sourceTree = "<group>"; };
+		1E56A7C518C584DE0092A759 /* DragerLibrary_Commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DragerLibrary_Commands.h; sourceTree = "<group>"; };
+		1E56A7C618C585090092A759 /* VentilationData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VentilationData.h; sourceTree = "<group>"; };
+		1E56A7C718C5852C0092A759 /* VentilationData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VentilationData.m; sourceTree = "<group>"; };
+		1E56A7C918C586180092A759 /* DeviceInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceInfo.h; sourceTree = "<group>"; };
+		1E56A7CA18C586180092A759 /* DeviceInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceInfo.m; sourceTree = "<group>"; };
+		1EC5674E18F386BF0098AF8D /* Hamilton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hamilton.h; sourceTree = "<group>"; };
+		1EC5674F18F386BF0098AF8D /* Hamilton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Hamilton.m; sourceTree = "<group>"; };
+		1EC5675118F38EA60098AF8D /* HamiltonLibrary_Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HamiltonLibrary_Commands.h; sourceTree = "<group>"; };
+		1EC5675418F63C3E0098AF8D /* SERVOi_Commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SERVOi_Commands.h; sourceTree = "<group>"; };
+		1EC5675B18F63D100098AF8D /* SERVOi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SERVOi.h; sourceTree = "<group>"; };
+		1EC5675C18F63D100098AF8D /* SERVOi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SERVOi.m; sourceTree = "<group>"; };
+		1EC7FA4318DC163A00C02121 /* DRAGER.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRAGER.h; sourceTree = "<group>"; };
+		1EC7FA4418DC163A00C02121 /* DRAGER.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DRAGER.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1E52A63518C57297007AC38D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E52A63C18C57297007AC38D /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1E52A64518C57297007AC38D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E52A64A18C57297007AC38D /* XCTest.framework in Frameworks */,
+				1E52A65018C57297007AC38D /* libBLE.a in Frameworks */,
+				1E52A64D18C57297007AC38D /* UIKit.framework in Frameworks */,
+				1E52A64B18C57297007AC38D /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1E52A62F18C57297007AC38D = {
+			isa = PBXGroup;
+			children = (
+				1E52A63D18C57297007AC38D /* BLE */,
+				1E52A65118C57297007AC38D /* BLETests */,
+				1E52A63A18C57297007AC38D /* Frameworks */,
+				1E52A63918C57297007AC38D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1E52A63918C57297007AC38D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1E52A63818C57297007AC38D /* libBLE.a */,
+				1E52A64818C57297007AC38D /* BLETests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1E52A63A18C57297007AC38D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1E52A63B18C57297007AC38D /* Foundation.framework */,
+				1E52A64918C57297007AC38D /* XCTest.framework */,
+				1E52A64C18C57297007AC38D /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1E52A63D18C57297007AC38D /* BLE */ = {
+			isa = PBXGroup;
+			children = (
+				1E56A7C418C584940092A759 /* Commands */,
+				1E52A66118C57336007AC38D /* Models */,
+				1E52A64018C57297007AC38D /* BLE.h */,
+				1E52A64218C57297007AC38D /* BLE.m */,
+				1E52A63E18C57297007AC38D /* Supporting Files */,
+			);
+			path = BLE;
+			sourceTree = "<group>";
+		};
+		1E52A63E18C57297007AC38D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1E52A63F18C57297007AC38D /* BLE-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		1E52A65118C57297007AC38D /* BLETests */ = {
+			isa = PBXGroup;
+			children = (
+				1E52A65718C57297007AC38D /* BLETests.m */,
+				1E52A65218C57297007AC38D /* Supporting Files */,
+			);
+			path = BLETests;
+			sourceTree = "<group>";
+		};
+		1E52A65218C57297007AC38D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1E52A65318C57297007AC38D /* BLETests-Info.plist */,
+				1E52A65418C57297007AC38D /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		1E52A66118C57336007AC38D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1E56A7C618C585090092A759 /* VentilationData.h */,
+				1E56A7C718C5852C0092A759 /* VentilationData.m */,
+				1E56A7C918C586180092A759 /* DeviceInfo.h */,
+				1E56A7CA18C586180092A759 /* DeviceInfo.m */,
+				1EC7FA4318DC163A00C02121 /* DRAGER.h */,
+				1EC7FA4418DC163A00C02121 /* DRAGER.m */,
+				1EC5674E18F386BF0098AF8D /* Hamilton.h */,
+				1EC5674F18F386BF0098AF8D /* Hamilton.m */,
+				1EC5675B18F63D100098AF8D /* SERVOi.h */,
+				1EC5675C18F63D100098AF8D /* SERVOi.m */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		1E56A7C418C584940092A759 /* Commands */ = {
+			isa = PBXGroup;
+			children = (
+				1E56A7C518C584DE0092A759 /* DragerLibrary_Commands.h */,
+				1EC5675118F38EA60098AF8D /* HamiltonLibrary_Commands.h */,
+				1EC5675418F63C3E0098AF8D /* SERVOi_Commands.h */,
+			);
+			name = Commands;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1E52A63718C57297007AC38D /* BLE */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1E52A65B18C57297007AC38D /* Build configuration list for PBXNativeTarget "BLE" */;
+			buildPhases = (
+				1E52A63418C57297007AC38D /* Sources */,
+				1E52A63518C57297007AC38D /* Frameworks */,
+				1E52A63618C57297007AC38D /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BLE;
+			productName = BLE;
+			productReference = 1E52A63818C57297007AC38D /* libBLE.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		1E52A64718C57297007AC38D /* BLETests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1E52A65E18C57297007AC38D /* Build configuration list for PBXNativeTarget "BLETests" */;
+			buildPhases = (
+				1E52A64418C57297007AC38D /* Sources */,
+				1E52A64518C57297007AC38D /* Frameworks */,
+				1E52A64618C57297007AC38D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1E52A64F18C57297007AC38D /* PBXTargetDependency */,
+			);
+			name = BLETests;
+			productName = BLETests;
+			productReference = 1E52A64818C57297007AC38D /* BLETests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1E52A63018C57297007AC38D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = Farland;
+			};
+			buildConfigurationList = 1E52A63318C57297007AC38D /* Build configuration list for PBXProject "BLE" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 1E52A62F18C57297007AC38D;
+			productRefGroup = 1E52A63918C57297007AC38D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1E52A63718C57297007AC38D /* BLE */,
+				1E52A64718C57297007AC38D /* BLETests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1E52A64618C57297007AC38D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E52A65618C57297007AC38D /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1E52A63418C57297007AC38D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1EC7FA4518DC163A00C02121 /* DRAGER.m in Sources */,
+				1EC5675018F386BF0098AF8D /* Hamilton.m in Sources */,
+				1E56A7CB18C586180092A759 /* DeviceInfo.m in Sources */,
+				1EC5675D18F63D100098AF8D /* SERVOi.m in Sources */,
+				1E56A7C818C5852C0092A759 /* VentilationData.m in Sources */,
+				1E52A64318C57297007AC38D /* BLE.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1E52A64418C57297007AC38D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E52A65818C57297007AC38D /* BLETests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1E52A64F18C57297007AC38D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1E52A63718C57297007AC38D /* BLE */;
+			targetProxy = 1E52A64E18C57297007AC38D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		1E52A65418C57297007AC38D /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1E52A65518C57297007AC38D /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1E52A65918C57297007AC38D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		1E52A65A18C57297007AC38D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1E52A65C18C57297007AC38D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/BLE.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BLE/BLE-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		1E52A65D18C57297007AC38D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/BLE.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BLE/BLE-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		1E52A65F18C57297007AC38D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BLE/BLE-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "BLETests/BLETests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		1E52A66018C57297007AC38D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BLE/BLE-Prefix.pch";
+				INFOPLIST_FILE = "BLETests/BLETests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1E52A63318C57297007AC38D /* Build configuration list for PBXProject "BLE" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E52A65918C57297007AC38D /* Debug */,
+				1E52A65A18C57297007AC38D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1E52A65B18C57297007AC38D /* Build configuration list for PBXNativeTarget "BLE" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E52A65C18C57297007AC38D /* Debug */,
+				1E52A65D18C57297007AC38D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1E52A65E18C57297007AC38D /* Build configuration list for PBXNativeTarget "BLETests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E52A65F18C57297007AC38D /* Debug */,
+				1E52A66018C57297007AC38D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1E52A63018C57297007AC38D /* Project object */;
+}
