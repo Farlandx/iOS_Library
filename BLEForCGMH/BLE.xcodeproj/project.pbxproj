@@ -100,8 +100,8 @@
 			isa = PBXGroup;
 			children = (
 				1E52A63D18C57297007AC38D /* BLE */,
-				1E52A65118C57297007AC38D /* BLETests */,
 				1E52A63A18C57297007AC38D /* Frameworks */,
+				1E52A65118C57297007AC38D /* BLETests */,
 				1E52A63918C57297007AC38D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -152,7 +152,7 @@
 				1E52A65218C57297007AC38D /* Supporting Files */,
 			);
 			path = BLETests;
-			sourceTree = "<group>";
+			sourceTree = SOURCE_ROOT;
 		};
 		1E52A65218C57297007AC38D /* Supporting Files */ = {
 			isa = PBXGroup;

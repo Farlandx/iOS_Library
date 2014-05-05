@@ -14,6 +14,7 @@
 typedef NS_ENUM(NSUInteger, BleReadStatus) {
     BLE_READ_NONE = 0,
     BLE_CONNECTING,
+    BLE_CONNECT_ERROR,
     BLE_READING_DATA,
     BLE_READ_ERROR,
     BLE_READ_DONE

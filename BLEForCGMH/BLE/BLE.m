@@ -136,7 +136,7 @@ typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
         return;
     }
     NSData *cmd = nil;
-    
+    NSLog(@"devicetype:%d", deviceType);
     switch (deviceType) {
         case DEVICE_TYPE_DRAGER:
             //傳值給DRAGER
@@ -157,6 +157,7 @@ typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
                     break;
                     
                 default:
+                    [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READING_DATA];
                     break;
             }
             
@@ -274,11 +275,15 @@ typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
         NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:deviceInfo.DeviceUUID];
         
         NSArray *ary = [_centralMgr retrievePeripheralsWithIdentifiers:@[uuid]];
+        if (ary == nil || ary.count == 0) {
+            [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_READ_ERROR];
+            return;
+        }
         _peripheral = [ary objectAtIndex:0];
-
-        [_centralMgr connectPeripheral:_peripheral options:nil];
         
         ventilation = [[VentilationData alloc] init];
+        [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_CONNECTING];
+        [_centralMgr connectPeripheral:_peripheral options:nil];
     }
 }
 

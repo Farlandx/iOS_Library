@@ -7,6 +7,10 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <CoreBluetooth/CoreBluetooth.h>
+#import "VentilationData.h"
+#import "DeviceInfo.h"
+#import "BLE.h"
 
 @interface BLETests : XCTestCase
 
@@ -28,7 +32,9 @@
 
 - (void)testExample
 {
-    XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+    //XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+//    BLE *ble = [[BLE alloc] init];
+//    [ble startReadByConnectionString:@"12909999-021A-21EB-3ED7-A49829039048**DRAGER"];
 }
 
 @end
