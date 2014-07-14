@@ -7,12 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "BLE_DEVICE_TYPE.h"
 
 @interface DeviceInfo : NSObject
 
-@property (strong, nonatomic) NSString *DeviceUUID;
-@property (strong, nonatomic) NSString *DeviceName;
+@property (strong, nonatomic) NSString *BleMacAddress;
+@property (nonatomic) DEVICE_TYPE DeviceType;
 
-- (id)initWithDeviceInfo:(NSString *)uuid :(NSString *)name;
+- (id)initWithDeviceInfoByBleMacAddress:(NSString *)BleMacAddress DeviceType:(NSString *)DeviceType;
 
 @end

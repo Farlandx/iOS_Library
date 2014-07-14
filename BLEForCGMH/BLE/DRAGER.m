@@ -17,8 +17,13 @@
     self = [super init];
     if (self) {
         step = DRAGER_ICC;
+        _mData = [[NSMutableData alloc] init];
     };
     return  self;
+}
+
+- (void)dealloc {
+    _delegate = nil;
 }
 
 //CHECKSUM Least significant 8-bit sum of all preceding bytes beginning with "ESC" in ASCII HEX format
@@ -35,7 +40,7 @@
     const char *chkSum = [self getChkSum:(esc + icc)];
     
     unsigned char cmd[5] = {esc, icc, chkSum[0], chkSum[1], cr};
-
+    
     return [NSData dataWithBytes:cmd length:sizeof(cmd)];
 }
 
@@ -244,10 +249,10 @@
             
         } else if (![code caseInsensitiveCompare:@"3C"]) {
             // XXXXX
-            refData.FlowSensitivity = [NSString stringWithFormat:@"%f", [value floatValue] / 10];
+            refData.FlowSensitivity = [NSString stringWithFormat:@"%.1lf", [value floatValue] / 10];
         } else if (![code caseInsensitiveCompare:@"3D"]) {
             // XXXXX
-            refData.BaseFlow = [NSString stringWithFormat:@"%f", [value floatValue] / 10];
+            refData.BaseFlow = [NSString stringWithFormat:@"%.1lf", [value floatValue] / 10];
         } else if (![code caseInsensitiveCompare:@"4E"]) {
             
         }
@@ -345,7 +350,7 @@
     step = DRAGER_ICC;
 }
 
-- (DRAGER_READ_STEP)run:(NSData *)data VentilationData:(VentilationData *)ventilation command:(NSData *)cmd {
+- (DRAGER_READ_STEP)run:(NSData *)data VentilationData:(VentilationData *)ventilation {
     if (data != nil) {
         const char *buffer = [data bytes];
         if (step == DRAGER_ICC && [data length] > 5 && buffer[0] == ESC && buffer[1] == ICC && buffer[2] == 0x36 && buffer[3] == 0x43 && buffer[4] == CR) {
@@ -366,7 +371,7 @@
                 return DRAGER_ERROR;
             }
         }
-        
+        NSLog(@"data:%@", [[NSString alloc] initWithData:_mData encoding:NSUTF8StringEncoding]);
         switch (step) {
             case DRAGER_ICC: //初始化中
                 if ([self dataCheck:_mData header:SOH command:ICC]) {
@@ -374,7 +379,7 @@
                     step = DRAGER_AFTER_ICC_CONFIG_COMMAND;
                     [self resetMData];
                     
-                    cmd = [self getConfigDataCommand:CONFIGURE_DATA_RESPONSE_COMMAND dataType:REQUEST_CURRENT_TEXT_MESSAGES dataCode:@"010206070E2D2E2F30311A0C0D32330A0B11350F1047203A2148491E222324"];
+                    [_delegate nextCommand:[self getConfigDataCommand:CONFIGURE_DATA_RESPONSE_COMMAND dataType:REQUEST_CURRENT_TEXT_MESSAGES dataCode:@"010206070E2D2E2F30311A0C0D32330A0B11350F1047203A2148491E222324"]];
                 }
                 break;
                 
@@ -382,7 +387,7 @@
                 if ([self dataCheck:_mData header:SOH command:CONFIGURE_DATA_RESPONSE_COMMAND]) {
                     step = DRAGER_GET_MODE;
                     [self resetMData];
-                    cmd = [self getBasicCommand:ESC cmdCode:REQUEST_CURRENT_TEXT_MESSAGES];
+                    [_delegate nextCommand:[self getBasicCommand:ESC cmdCode:REQUEST_CURRENT_TEXT_MESSAGES]];
                 }
                 break;
                 
@@ -409,7 +414,7 @@
                     [self resetMData];
                     
                     //取得設備設定設定值
-                    cmd = [self getConfigDataCommand:CONFIGURE_DATA_RESPONSE_COMMAND dataType:REQUEST_CURRENT_DEVICE_SETTING dataCode:@"010204050708090B0D0E0F1011121316292E3C3D4E"];
+                    [_delegate nextCommand:[self getConfigDataCommand:CONFIGURE_DATA_RESPONSE_COMMAND dataType:REQUEST_CURRENT_DEVICE_SETTING dataCode:@"010204050708090B0D0E0F1011121316292E3C3D4E"]];
                 }
                 break;
                 
@@ -418,7 +423,7 @@
                     step = DRAGER_CURRENT_DEVICE_SETTING;
                     [self resetMData];
                     
-                    cmd = [self getBasicCommand:ESC cmdCode:REQUEST_CURRENT_DEVICE_SETTING];
+                    [_delegate nextCommand:[self getBasicCommand:ESC cmdCode:REQUEST_CURRENT_DEVICE_SETTING]];
                 }
                 break;
                 
@@ -437,23 +442,23 @@
                     
                     if (ventilation.PressureSupport != nil && ![ventilation.PressureSupport isEqualToString:@""] && ventilation.PEEP != nil && ![ventilation.PEEP isEqualToString:@""]) {
                         //PressureSupport = PressureSupport - PEEP
-                        ventilation.PressureSupport = [NSString stringWithFormat:@"%f", [ventilation.PressureSupport floatValue] - [ventilation.PEEP floatValue]];
+                        ventilation.PressureSupport = [NSString stringWithFormat:@"%.1lf", [ventilation.PressureSupport floatValue] - [ventilation.PEEP floatValue]];
                     }
+                    
+                    step = DRAGER_AFTER_DEVICE_SETTING_CONFIG_COMMAND;
+                    [self resetMData];
+                    
+                    //取得量測值
+                    NSLog(@"取得量測值");
+                    [_delegate nextCommand:[self getConfigDataCommand:CONFIGURE_DATA_RESPONSE_COMMAND dataType:REQUEST_CURRENT_MEASURED_DATA_PAGE1 dataCode:@"060B73747D88B9D6F0"]];
                 }
-                
-                step = DRAGER_AFTER_DEVICE_SETTING_CONFIG_COMMAND;
-                [self resetMData];
-                
-                //取得量測值
-                NSLog(@"取得量測值");
-                cmd = [self getConfigDataCommand:CONFIGURE_DATA_RESPONSE_COMMAND dataType:REQUEST_CURRENT_MEASURED_DATA_PAGE1 dataCode:@"060B73747D88B9D6F0"];
                 break;
                 
             case DRAGER_AFTER_DEVICE_SETTING_CONFIG_COMMAND://取得量測值設定值
                 if ([self dataCheck:_mData header:SOH command:CONFIGURE_DATA_RESPONSE_COMMAND]) {
                     step = DRAGER_CURRENT_MEASURED_DATA_PAGE1;
                     [self resetMData];
-                    cmd = [self getBasicCommand:ESC cmdCode:REQUEST_CURRENT_MEASURED_DATA_PAGE1];
+                    [_delegate nextCommand:[self getBasicCommand:ESC cmdCode:REQUEST_CURRENT_MEASURED_DATA_PAGE1]];
                 }
                 break;
                 
@@ -461,30 +466,58 @@
                 if ([self dataCheck:_mData header:SOH command:REQUEST_CURRENT_MEASURED_DATA_PAGE1]) {
                     NSString *values = [[NSString alloc] initWithString:[[NSString alloc] initWithData:_mData encoding:NSUTF8StringEncoding]];
                     [self parseMeadused:values VentilationData:ventilation];
-                    step = DRAGER_AFTER_CURRENT_MEASURED_DATA_PAGE1;
+                    step = DRAGER_GET_LOWERMV_CONFIG_COMMAND;
                     [self resetMData];
                     //LowerMV
                     NSLog(@"LowerMV");
-                    cmd = [self getConfigDataCommand:CONFIGURE_DATA_RESPONSE_COMMAND dataType:REQUEST_LOW_ALARM_LIMITS_PAGE1 dataCode:@"B9"];
+                    [_delegate nextCommand:[self getConfigDataCommand:CONFIGURE_DATA_RESPONSE_COMMAND dataType:REQUEST_LOW_ALARM_LIMITS_PAGE1 dataCode:@"B9"]];
+                }
+                break;
+                
+            case DRAGER_GET_LOWERMV_CONFIG_COMMAND:
+                if ([self dataCheck:_mData header:SOH command:CONFIGURE_DATA_RESPONSE_COMMAND]) {
+                    step = DRAGER_GET_LOWERMV;
+                    [self resetMData];
+                    [_delegate nextCommand:[self getBasicCommand:ESC cmdCode:REQUEST_LOW_ALARM_LIMITS_PAGE1]];
+                }
+                break;
+                
+            case DRAGER_GET_LOWERMV:
+                if ([self dataCheck:_mData header:SOH command:REQUEST_LOW_ALARM_LIMITS_PAGE1]) {
+                    NSString *values = [[NSString alloc] initWithString:[[NSString alloc] initWithData:_mData encoding:NSUTF8StringEncoding]];
+                    NSString *strMeasure = [values substringWithRange:NSMakeRange(2, [values length] - 2)];
+                    if ([strMeasure isEqualToString:@""]) {
+                        return DRAGER_WAITING;
+                    }
+                    ventilation.LowerMV = [[strMeasure substringWithRange:NSMakeRange(2, 4)] stringByReplacingOccurrencesOfString:@" " withString:@""];
+                    step = DRAGER_AFTER_CURRENT_MEASURED_DATA_PAGE1;
+                    [self resetMData];
+                    
+                    //HightPerssureAlarm
+                    NSLog(@"HightPerssureAlarm");
+                    [_delegate nextCommand:[self getConfigDataCommand:CONFIGURE_DATA_RESPONSE_COMMAND dataType:REQUEST_HIGHT_ALARM_LIMITS_PAGE1 dataCode:@"7D"]];
                 }
                 break;
                 
             case DRAGER_AFTER_CURRENT_MEASURED_DATA_PAGE1:
                 if ([self dataCheck:_mData header:SOH command:CONFIGURE_DATA_RESPONSE_COMMAND]) {
-                    step = DRAGER_GET_LOWERMV;
+                    step = DRAGER_LAST;
                     [self resetMData];
-                    cmd = [self getBasicCommand:ESC cmdCode:REQUEST_LOW_ALARM_LIMITS_PAGE1];
+                    NSLog(@"REQUEST_LOW_ALARM_LIMITS_PAGE1");
+                    [_delegate nextCommand:[self getBasicCommand:ESC cmdCode:REQUEST_HIGHT_ALARM_LIMITS_PAGE1]];
                 }
                 break;
                 
-            case DRAGER_GET_LOWERMV:
+            case DRAGER_LAST:
+                NSLog(@"DRAGER_LAST");
                 if ([self dataCheck:_mData header:SOH command:REQUEST_HIGHT_ALARM_LIMITS_PAGE1]) {
                     NSString *values = [[NSString alloc] initWithString:[[NSString alloc] initWithData:_mData encoding:NSUTF8StringEncoding]];
                     NSString *strMeasure = [values substringWithRange:NSMakeRange(2, [values length] - 2)];
                     ventilation.HighPressureAlarm = [[strMeasure substringWithRange:NSMakeRange(2, 4)] stringByReplacingOccurrencesOfString:@" " withString:@""];
                     step = DRAGER_DONE;
                     [self resetMData];
-                    cmd = [self getBasicCommand:ESC cmdCode:STOP];
+                    NSLog(@"done");
+                    [_delegate nextCommand:[self getBasicCommand:ESC cmdCode:STOP]];
                 }
                 break;
                 

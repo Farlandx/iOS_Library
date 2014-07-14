@@ -63,6 +63,7 @@
 		1E56A7C718C5852C0092A759 /* VentilationData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VentilationData.m; sourceTree = "<group>"; };
 		1E56A7C918C586180092A759 /* DeviceInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceInfo.h; sourceTree = "<group>"; };
 		1E56A7CA18C586180092A759 /* DeviceInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceInfo.m; sourceTree = "<group>"; };
+		1E948E4E1973864E0031F415 /* BLE_DEVICE_TYPE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BLE_DEVICE_TYPE.h; path = BLE/BLE_DEVICE_TYPE.h; sourceTree = SOURCE_ROOT; };
 		1EC5674E18F386BF0098AF8D /* Hamilton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hamilton.h; sourceTree = "<group>"; };
 		1EC5674F18F386BF0098AF8D /* Hamilton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Hamilton.m; sourceTree = "<group>"; };
 		1EC5675118F38EA60098AF8D /* HamiltonLibrary_Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HamiltonLibrary_Commands.h; sourceTree = "<group>"; };
@@ -128,6 +129,7 @@
 		1E52A63D18C57297007AC38D /* BLE */ = {
 			isa = PBXGroup;
 			children = (
+				1E948E4D1973862F0031F415 /* Header */,
 				1E56A7C418C584940092A759 /* Commands */,
 				1E52A66118C57336007AC38D /* Models */,
 				1E52A64018C57297007AC38D /* BLE.h */,
@@ -188,6 +190,15 @@
 				1EC5675418F63C3E0098AF8D /* SERVOi_Commands.h */,
 			);
 			name = Commands;
+			sourceTree = "<group>";
+		};
+		1E948E4D1973862F0031F415 /* Header */ = {
+			isa = PBXGroup;
+			children = (
+				1E948E4E1973864E0031F415 /* BLE_DEVICE_TYPE.h */,
+			);
+			name = Header;
+			path = "../../../iOS_Project/VentilatorForCGMH/呼吸照護";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

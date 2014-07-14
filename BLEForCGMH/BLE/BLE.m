@@ -7,6 +7,7 @@
 //
 
 #import "BLE.h"
+#import "BLE_DEVICE_TYPE.h"
 #import <UIKit/UIKit.h>
 #import "DRAGER.h"
 #import "Hamilton.h"
@@ -18,20 +19,19 @@
 #define SERVICE_UUID @"49535343-FE7D-4AE5-8FA9-9FAFD205E455"
 #define NOTIFY_UUID @"49535343-1E4D-4BD9-BA61-23C647249616"
 #define WRITE_UUID @"49535343-8841-43F4-A8D4-ECBE34729BB3"
+#define TIME_OUT_INTERVAL 10.0f
 
 #endif
 
-typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
-    DEVICE_TYPE_NONE = 0,
-    DEVICE_TYPE_UNKNOW,
-    DEVICE_TYPE_DRAGER,
-    DEVICE_TYPE_SERVOI,
-    DEVICE_TYPE_HAMILTON
-};
+@interface BLE ()<DRAGER_Delegate, Hamilton_Delegate, SERVOi_Delegate>
+
+@end
 
 @implementation BLE {
     id device;
     DEVICE_TYPE deviceType;
+    BOOL isFindDevice;
+    NSTimer *timeoutTimer;
 }
 
 - (id)init {
@@ -39,19 +39,56 @@ typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
     if (self) {
         deviceType = DEVICE_TYPE_UNKNOW;
         ventilation = [[VentilationData alloc] init];
+        isFindDevice = NO;
+        timeoutTimer = [[NSTimer alloc] init];
     }
     return self;
 }
 
 - (void)dealloc {
+    [self disconnect];
     _delegate = nil;
 }
 
-#pragma -mark Bluetooth Delegate
-//簡查設備是否支持BLE
+#pragma mark - Bluetooth Delegate
+//檢查設備是否支持BLE
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central {
-    if (central.state != CBCentralManagerStatePoweredOn) {
-        //藍牙沒有打開
+    if (central.state == CBCentralManagerStatePoweredOn) {
+        [self scanDevices];
+    }
+}
+
+//掃到設備
+- (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI {
+    NSString *peripheralName = [peripheral.name stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    NSLog(@"Discovered %@, UUID:%@, RSSI:%@", peripheralName, [[peripheral identifier] UUIDString], RSSI);
+    
+    if (deviceInfo != nil && [peripheralName isEqualToString:deviceInfo.BleMacAddress] && !isFindDevice) {
+        [timeoutTimer invalidate];
+        isFindDevice = YES;
+        NSArray *ary = [_centralMgr retrievePeripheralsWithIdentifiers:@[peripheral.identifier]];
+        if (ary == nil || ary.count == 0) {
+            [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_CONNECT_ERROR];
+            return;
+        }
+        _peripheral = [ary objectAtIndex:0];
+        [_centralMgr connectPeripheral:_peripheral options:nil];
+        
+        ventilation = [[VentilationData alloc] init];
+    }
+    else if(!isFindDevice) {
+        [timeoutTimer invalidate];
+        timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:5.0f target:self selector:@selector(scanStop:) userInfo:nil repeats:NO];
+    }
+}
+
+//中斷連線
+- (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
+    if (_peripheral) {
+        _peripheral = nil;
+        
+        NSLog(@"Disconnected.");
+        [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_DISCONNECTED];
     }
 }
 
@@ -112,47 +149,63 @@ typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
     }
     
     if (_peripheral.state != CBPeripheralStateDisconnected && _notifyCharacteristic != nil && _writeCharacteristic != nil) {
-        if ([deviceInfo.DeviceName isEqualToString:@"DRAGER"]) {
-            deviceType = DEVICE_TYPE_DRAGER;
-            device = [[DRAGER alloc] init];
-            NSData *cmdICC = [device getICC_Command];
-            [self sendData:cmdICC];
-        }
-        else if ([deviceInfo.DeviceName isEqualToString:@"HAMILTON"]) {
-            deviceType = DEVICE_TYPE_HAMILTON;
-            device = [[Hamilton alloc] init];
-        }
-        else if ([deviceInfo.DeviceName isEqualToString:@"SERVOI"]) {
-            deviceType = DEVICE_TYPE_SERVOI;
-            device = [[SERVOi alloc] init];
-            NSData *cmdInit = [device getInitCommand];
-            [self sendData:cmdInit];
+        deviceType = deviceInfo.DeviceType;
+        switch (deviceType) {
+            case DEVICE_TYPE_DRAGER: {
+                device = [[DRAGER alloc] init];
+                ((DRAGER *)device).delegate = self;
+                NSData *cmdICC = [device getICC_Command];
+                [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_READING_DATA];
+                [self sendData:cmdICC];
+                break;
+            }
+                
+            case DEVICE_TYPE_HAMILTON: {
+                device = [[Hamilton alloc] init];
+                ((Hamilton *)device).delegate = self;
+                NSData *cmdFirst = [device getCommand:40];
+                [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_READING_DATA];
+                [self sendData:cmdFirst];
+                break;
+            }
+                
+            case DEVICE_TYPE_SERVOI: {
+                device = [[SERVOi alloc] init];
+                ((SERVOi *)device).delegate = self;
+                NSData *cmdInit = [device getInitCommand];
+                [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_READING_DATA];
+                [self sendData:cmdInit];
+                break;
+            }
+                
+            default:
+                break;
         }
     }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
     if (error) {
+        NSLog(@"peripheral error");
         return;
     }
     NSData *cmd = nil;
-    NSLog(@"devicetype:%d", deviceType);
     switch (deviceType) {
         case DEVICE_TYPE_DRAGER:
             //傳值給DRAGER
-            switch ([device run:characteristic.value VentilationData:ventilation command:cmd]) {
+            switch ([device run:characteristic.value VentilationData:ventilation]) {
                 case DRAGER_DONE:
                     [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_DONE];
-                    [self sendData:cmd];
-                    [device resetStep];
-                    cmd = nil;
                     
+                    [timeoutTimer invalidate];
                     usleep(300000);
                     [self disconnect];
+                    [device resetStep];
                     break;
                     
                 case DRAGER_ERROR:
                     [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_ERROR];
+                    [timeoutTimer invalidate];
                     [self disconnect];
                     break;
                     
@@ -168,53 +221,46 @@ typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
             
         case DEVICE_TYPE_HAMILTON:
             //傳值給HAMILTON
-            switch ([device run:characteristic.value VentilationData:ventilation command:cmd]) {
+            switch ([device run:characteristic.value VentilationData:ventilation]) {
                 case HAMILTON_DONE:
                     [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_DONE];
-                    [device resetStep];
-                    cmd = nil;
                     
+                    [timeoutTimer invalidate];
                     usleep(300000);
                     [self disconnect];
-                    
+                    [device resetStep];
                     break;
                     
                 case HAMILTON_ERROR:
                     [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_ERROR];
+                    [timeoutTimer invalidate];
                     [self disconnect];
                     break;
                     
                 default:
                     break;
-            }
-            
-            if (cmd != nil) {
-                [self sendData:cmd];
             }
             break;
             
         case DEVICE_TYPE_SERVOI:
-            switch ([device run:characteristic.value VentilationData:ventilation command:cmd]) {
+            switch ([device run:characteristic.value VentilationData:ventilation]) {
                 case SERVOI_DONE:
                     [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_DONE];
-                    [device resetStep];
-                    cmd = nil;
                     
+                    [timeoutTimer invalidate];
                     usleep(300000);
                     [self disconnect];
+                    [device resetStep];
                     break;
                     
                 case SERVOI_ERROR:
                     [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_ERROR];
+                    [timeoutTimer invalidate];
                     [self disconnect];
                     break;
                     
                 default:
                     break;
-            }
-            
-            if (cmd != nil) {
-                [self sendData:cmd];
             }
             break;
             
@@ -223,8 +269,13 @@ typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
     }
 }
 
-#pragma -mark private Methods
+#pragma mark - Device Delegate
+- (void)nextCommand:(NSData *)cmd {
+    NSLog(@"send next command:%@", [[NSString alloc] initWithData:cmd encoding:NSUTF8StringEncoding]);
+    [self sendData:cmd];
+}
 
+#pragma -mark private Methods
 - (void)readValue {
     [_peripheral readValueForCharacteristic:_notifyCharacteristic];
 }
@@ -233,57 +284,83 @@ typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
     @try {
         NSLog(@"SendData:%ld", [data length]);
         [_peripheral writeValue:data forCharacteristic:_writeCharacteristic type:CBCharacteristicWriteWithoutResponse];
+        [timeoutTimer invalidate];
+        timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_OUT_INTERVAL target:self selector:@selector(timeroutThread) userInfo:nil repeats:NO];
     }
     @catch (NSException *exception) {
         NSLog(@"SendData Exception: %@", exception);
     }
 }
 
-- (void)disconnect {
-    [_centralMgr cancelPeripheralConnection:_peripheral];
-    _notifyCharacteristic = nil;
-    _writeCharacteristic = nil;
-    device = nil;
-    deviceType = DEVICE_TYPE_NONE;
-    deviceInfo = nil;
-    NSLog(@"Disconnect.");
-}
-
 - (DeviceInfo *)getDeviceInfoByCode:(NSString *)code {
     DeviceInfo *di = [DeviceInfo alloc];
     
     if (code == nil || [code isEqualToString:@""] || [code rangeOfString:@"**"].location == NSNotFound) {
-        //code和型號一定要有，否則回傳nil
+        //code和型號一定要有，否則回傳nil，mac_address不影響連線則不管他
         return nil;
     }
     else {
         NSArray *ary = [code componentsSeparatedByString:@"**"];
-        di = [di initWithDeviceInfo:[ary objectAtIndex:0] :[ary objectAtIndex:1]];
+        di = [di initWithDeviceInfoByBleMacAddress:[ary objectAtIndex:0] DeviceType:[ary objectAtIndex:1]];
     }
     
     return di;
 }
 
-#pragma -mark Methods
-- (void)startReadByConnectionString:(NSString *)connectString {
+- (void)scanDevices {
+    [_centralMgr scanForPeripheralsWithServices:nil options:nil];
+    //五秒後停止scan
+    //    [NSTimer scheduledTimerWithTimeInterval:5.0f target:self selector:@selector(scanStop:) userInfo:nil repeats:NO];
+}
+
+#pragma mark - Timer
+- (void)timeroutThread {
+    NSLog(@"%s", __func__);
+    [self disconnect];
+}
+
+- (void)scanStop:(NSTimer*)timer {
+    if (_centralMgr != nil){
+        [_centralMgr stopScan];
+        [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_SCAN_TIMEOUT];
+    }else{
+        NSLog(@"_centralMgr is Null!");
+    }
+}
+
+#pragma mark - Methods
+//ConnectionString:BLE Name**DeviceType**MAC Address (Total 48 bytes)
+- (void)setConnectionString:(NSString *)connectionString {
     [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_CONNECTING];
     
-    deviceInfo = [self getDeviceInfoByCode:connectString];
-    
+    deviceInfo = [self getDeviceInfoByCode:connectionString];
+}
+
+- (void)startRead {
     if (deviceInfo != nil) {
-        _centralMgr = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
-        NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:deviceInfo.DeviceUUID];
-        
-        NSArray *ary = [_centralMgr retrievePeripheralsWithIdentifiers:@[uuid]];
-        if (ary == nil || ary.count == 0) {
-            [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_READ_ERROR];
-            return;
+        if (!_centralMgr) {
+            _centralMgr = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
         }
-        _peripheral = [ary objectAtIndex:0];
-        
-        ventilation = [[VentilationData alloc] init];
-        [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_CONNECTING];
-        [_centralMgr connectPeripheral:_peripheral options:nil];
+        else {
+            [self scanDevices];
+        }
+        [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_SCANNING];
+    }
+    else [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_CONNECT_ERROR];
+}
+
+- (void)disconnect {
+    if (_peripheral && _peripheral.state != CBPeripheralStateDisconnected) {
+        if ([timeoutTimer isValid]) {
+            [timeoutTimer invalidate];
+        }
+        [_centralMgr cancelPeripheralConnection:_peripheral];
+        _notifyCharacteristic = nil;
+        _writeCharacteristic = nil;
+        device = nil;
+        deviceType = DEVICE_TYPE_NONE;
+        deviceInfo = nil;
+        [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_DISCONNECTED];
     }
 }
 

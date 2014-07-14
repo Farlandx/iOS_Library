@@ -9,6 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "VentilationData.h"
 
+@protocol Hamilton_Delegate <NSObject>
+
+- (void)nextCommand:(NSData *)cmd;
+
+@end
+
 @interface Hamilton : NSObject
 
 typedef NS_ENUM(NSUInteger, HAMILTON_READ_STEP) {
@@ -18,6 +24,7 @@ typedef NS_ENUM(NSUInteger, HAMILTON_READ_STEP) {
     HAMILTON_GET_TIDAL_VOLUME = 43,
     HAMILTON_GET_PERCENT_MIN_VOL_SET = 111,
     HAMILTON_GET_INSP_T = 113,
+    HAMILTON_GET_SIMV_MODE_IE_RATION = 65,
     HAMILTON_GET_IE_RATION = 105,
     HAMILTON_GET_PEEP_PLOW = 48,
     HAMILTON_GET_PRESSURE_SUPPORT = 49,
@@ -36,10 +43,12 @@ typedef NS_ENUM(NSUInteger, HAMILTON_READ_STEP) {
     HAMILTON_GET_COMPLIANCE = 74,
     HAMILTON_GET_LOWER_MV = 54,
     HAMILTON_GET_HIGH_PRESSURE_ALARM = 53,
-    HAMILTON_ERROR,
-    HAMILTON_WAITING,
-    HAMILTON_DONE
+    HAMILTON_ERROR = 404,
+    HAMILTON_WAITING = 405,
+    HAMILTON_DONE = 406
 };
+
+@property (assign, nonatomic) id<Hamilton_Delegate> delegate;
 
 - (HAMILTON_READ_STEP)run:(NSData *)data VentilationData:(VentilationData *)ventilation command:(NSData *)cmd;
 - (NSData *)getCommand:(int)cmd;

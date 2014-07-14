@@ -12,6 +12,7 @@
 @implementation Hamilton {
     HAMILTON_READ_STEP step;
     int mode;
+    NSMutableData *mData;
 }
 
 - (id)init {
@@ -19,22 +20,35 @@
     if (self) {
         step = HAMILTON_GET_VENTILATION_MODE;
         mode = -1;
+        mData = [[NSMutableData alloc] init];
     }
     return self;
 }
 
-- (NSData *)getCommand:(int)cmd {
-    unsigned char result[4] = {STX, cmd, ETX, CR};
-    return [[NSData alloc] initWithBytes:result length:sizeof(result)];
+- (void)dealloc {
+    _delegate = nil;
 }
 
-- (int)Bit7ToBit8:(int)by {
-    int tmp  = by & 0xFF;
-    if (tmp > 128) {
-        tmp -= 128;
+- (void)resetMData {
+    if ([mData length] > 0) {
+        //[_mData replaceBytesInRange:NSMakeRange(0, [_mData length]) withBytes:nil length:0];
+        [mData setLength:0];
+        NSLog(@"mData reset");
     }
-    return tmp;
 }
+
+- (NSData *)getCommand:(int)cmd {
+    unsigned char result[4] = {STX, cmd, ETX, CR};
+    return [[NSData alloc] initWithBytes:result length:4];
+}
+
+//- (int)Bit7ToBit8:(int)by {
+//    int tmp  = by & 0xFF;
+//    if (tmp > 128) {
+//        tmp -= 128;
+//    }
+//    return tmp;
+//}
 
 - (NSString *)getMode:(NSString *)code {
     switch ([code intValue]) {
@@ -74,14 +88,22 @@
     NSString *result = @"";
     const char* buffer = [data bytes];
     
-    result = [NSString stringWithFormat:@"%d%d%d%d%d",
-              [self Bit7ToBit8:buffer[2]],
-              [self Bit7ToBit8:buffer[3]],
-              [self Bit7ToBit8:buffer[4]],
-              [self Bit7ToBit8:buffer[5]],
-              [self Bit7ToBit8:buffer[6]]];
-    
-    if (![[result substringWithRange:NSMakeRange([result length] - 1, [result length])] isEqualToString:@"."]) {
+    //    result = [NSString stringWithFormat:@"%d%d%d%d%d",
+    //              [self Bit7ToBit8:buffer[2]],
+    //              [self Bit7ToBit8:buffer[3]],
+    //              [self Bit7ToBit8:buffer[4]],
+    //              [self Bit7ToBit8:buffer[5]],
+    //              [self Bit7ToBit8:buffer[6]]];
+    //    result = [NSString stringWithFormat:@"%d%d%d%d%d",
+    //              buffer[2],
+    //              buffer[3],
+    //              buffer[4],
+    //              buffer[5],
+    //              buffer[6]];
+    unsigned char tmp[5] ={buffer[2],  buffer[3], buffer[4], buffer[5], buffer[6]};
+    result = [[NSString alloc] initWithData:[[NSData alloc] initWithBytes:tmp length:5] encoding:NSUTF8StringEncoding];
+    NSLog(@"result:%@", [result substringWithRange:NSMakeRange([result length] - 1, 1)]);
+    if ([[result substringWithRange:NSMakeRange([result length] - 1, 1)] isEqualToString:@"."]) {
         result = [result substringWithRange:NSMakeRange(0, [result length] - 1)];
     }
     if (![result caseInsensitiveCompare:@"9999"] || ![result caseInsensitiveCompare:@"999.9"]) {
@@ -91,12 +113,15 @@
     return [result stringByReplacingOccurrencesOfString:@" " withString:@""];
 }
 
-//Data結尾是CR返回YES
+//Data找到CR返回YES
 - (BOOL)chkData:(NSData *)data {
-    const char* buffer = [data bytes];
-    int len = sizeof(buffer);
-    if (len > 0 && buffer[len - 1] == CR) {
-        return YES;
+    if (data != nil) {
+        const char* bytes = [data bytes];
+        for (int i = 0; i < [data length]; i++) {
+            if (bytes[i] == CR) {
+                return YES;
+            }
+        }
     }
     return NO;
 }
@@ -105,12 +130,15 @@
     step = HAMILTON_GET_VENTILATION_MODE;
 }
 
-- (HAMILTON_READ_STEP)run:(NSData *)data VentilationData:(VentilationData *)ventilation command:(NSData *)cmd {
+- (HAMILTON_READ_STEP)run:(NSData *)data VentilationData:(VentilationData *)ventilation {
+    [mData appendData:data];
+    //    NSLog(@"data:%@", [[NSString alloc] initWithData:mData encoding:NSUTF8StringEncoding]);
     if (data == nil || ![self chkData:data]) {
         return HAMILTON_WAITING;
     }
     
-    NSString *strData = [self getValue:data];
+    NSString *strData = [self getValue:mData];
+    NSLog(@"strData:%@", strData);
     
     switch (step) {
         case HAMILTON_GET_VENTILATION_MODE:
@@ -121,19 +149,21 @@
             ventilation.VentilationMode = [NSString stringWithFormat:@"%d", mode];
             
             step = HAMILTON_GET_VENTILATION_RATE_SET;
-            cmd = [self getCommand:HAMILTON_GET_VENTILATION_RATE_SET];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_VENTILATION_RATE_SET]];
             break;
             
         case HAMILTON_GET_VENTILATION_RATE_SET:
             /**
 			 * VentilationRateSet(41) return XXXX.
 			 */
-            if (mode != 17) {
+            if (mode != 2 && mode != 17) {
                 ventilation.VentilationRateSet = strData;
             }
             
             step = HAMILTON_GET_SIMV_RATE_SET;
-            cmd = [self getCommand:HAMILTON_GET_SIMV_RATE_SET];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_SIMV_RATE_SET]];
             break;
             
         case HAMILTON_GET_SIMV_RATE_SET:
@@ -141,11 +171,12 @@
 			 * SIMVRateSet(42) return XXX.X
 			 */
             if (mode == 2 || mode == 17 || mode == 20) {
-                ventilation.SIMVRateSet = strData;
+                ventilation.SIMVRateSet = [NSString stringWithFormat:@"%.1lf", [strData floatValue]];
             }
             
             step = HAMILTON_GET_TIDAL_VOLUME;
-            cmd = [self getCommand:HAMILTON_GET_TIDAL_VOLUME];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_TIDAL_VOLUME]];
             break;
             
         case HAMILTON_GET_TIDAL_VOLUME:
@@ -159,12 +190,16 @@
                 ventilation.VolumeTarget = strData;
             }
             
-            if (![ventilation.VentilationRateSet isEqualToString:@""] && ![ventilation.TidalVolumeSet isEqualToString:@""]) {
-                ventilation.MVSet = [NSString stringWithFormat:@"%f", [ventilation.TidalVolumeSet floatValue] / 1000 * [ventilation.VentilationRateSet integerValue]];
+            if (mode == 2 || mode == 17) {
+                ventilation.MVSet = [NSString stringWithFormat:@"%.1lf", [ventilation.TidalVolumeSet floatValue] / 1000 * [ventilation.SIMVRateSet integerValue]];
+            }
+            else if (![ventilation.VentilationRateSet isEqualToString:@""] && ![ventilation.TidalVolumeSet isEqualToString:@""]) {
+                ventilation.MVSet = [NSString stringWithFormat:@"%.1lf", [ventilation.TidalVolumeSet floatValue] / 1000 * [ventilation.VentilationRateSet integerValue]];
             }
             
             step = HAMILTON_GET_PERCENT_MIN_VOL_SET;
-            cmd = [self getCommand:HAMILTON_GET_PERCENT_MIN_VOL_SET];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_PERCENT_MIN_VOL_SET]];
             break;
             
         case HAMILTON_GET_PERCENT_MIN_VOL_SET:
@@ -174,30 +209,41 @@
             ventilation.PercentMinVolSet = strData;
             
             step = HAMILTON_GET_INSP_T;
-            cmd = [self getCommand:HAMILTON_GET_INSP_T];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_INSP_T]];
             break;
             
         case HAMILTON_GET_INSP_T:
             /**
 			 * InspT(113) retuen XX.XX
 			 */
-            ventilation.InspT = strData;
+            if (mode != 4) {
+                ventilation.InspT = strData;
+            }
+            
             step = HAMILTON_GET_IE_RATION;
-            cmd = [self getCommand:HAMILTON_GET_IE_RATION];
+            [self resetMData];
+            if (mode == 2) {
+                [_delegate nextCommand:[self getCommand:HAMILTON_GET_SIMV_MODE_IE_RATION]];
+            }
+            else {
+                [_delegate nextCommand:[self getCommand:HAMILTON_GET_IE_RATION]];
+            }
             break;
             
         case HAMILTON_GET_IE_RATION:
             /**
 			 * I:E Ratio XX.XX
 			 */
-            if (mode == 1 || mode == 19 || mode == 21 || mode == 26) {
+            if (mode == 1 || mode == 2 || mode == 19 || mode == 21 || mode == 26) {
                 if (![strData isEqualToString:@""]) {
                     ventilation.InspirationExpirationRatio = [@"1:" stringByAppendingString:strData];
                 }
             }
             
             step = HAMILTON_GET_PEEP_PLOW;
-            cmd = [self getCommand:HAMILTON_GET_PEEP_PLOW];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_PEEP_PLOW]];
             break;
             
         case HAMILTON_GET_PEEP_PLOW:
@@ -218,7 +264,8 @@
             }
             
             step = HAMILTON_GET_PRESSURE_SUPPORT;
-            cmd = [self getCommand:HAMILTON_GET_PRESSURE_SUPPORT];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_PRESSURE_SUPPORT]];
             break;
             
         case HAMILTON_GET_PRESSURE_SUPPORT:
@@ -228,7 +275,8 @@
             ventilation.PressureSupport = strData;
             
             step = HAMILTON_GET_FIO2SET;
-            cmd = [self getCommand:HAMILTON_GET_FIO2SET];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_FIO2SET]];
             break;
             
         case HAMILTON_GET_FIO2SET:
@@ -238,7 +286,8 @@
             ventilation.FiO2Set = strData;
             
             step = HAMILTON_GET_PRESSURE_CONTROL_PHIGHT;
-            cmd = [self getCommand:HAMILTON_GET_PRESSURE_CONTROL_PHIGHT];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_PRESSURE_CONTROL_PHIGHT]];
             break;
             
         case HAMILTON_GET_PRESSURE_CONTROL_PHIGHT:
@@ -255,7 +304,8 @@
             }
             
             step = HAMILTON_GET_FLOW_SETTING;
-            cmd = [self getCommand:HAMILTON_GET_FLOW_SETTING];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_FLOW_SETTING]];
             break;
             
         case HAMILTON_GET_FLOW_SETTING:
@@ -265,7 +315,8 @@
             ventilation.FlowSetting = strData;
             
             step = HAMILTON_GET_TIDAL_VOLUME_MEASURED;
-            cmd = [self getCommand:HAMILTON_GET_TIDAL_VOLUME_MEASURED];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_TIDAL_VOLUME_MEASURED]];
             break;
             
         case HAMILTON_GET_TIDAL_VOLUME_MEASURED:
@@ -275,7 +326,8 @@
             ventilation.TidalVolumeMeasured = strData;
             
             step = HAMILTON_GET_VENTILATION_RATE_TOTAL;
-            cmd = [self getCommand:HAMILTON_GET_VENTILATION_RATE_TOTAL];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_VENTILATION_RATE_TOTAL]];
             break;
             
         case HAMILTON_GET_VENTILATION_RATE_TOTAL:
@@ -285,17 +337,21 @@
             ventilation.VentilationRateTotal = strData;
             
             step = HAMILTON_GET_FLOW_MEASURE;
-            cmd = [self getCommand:HAMILTON_GET_FLOW_MEASURE];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_FLOW_MEASURE]];
             break;
             
         case HAMILTON_GET_FLOW_MEASURE:
             /**
 			 * FlowMeasured(75) return XXXX.
 			 */
-            ventilation.FlowMeasured = strData;
+            if (mode != 4) {
+                ventilation.FlowMeasured = strData;
+            }
             
             step = HAMILTON_GET_MV_TOTAL;
-            cmd = [self getCommand:HAMILTON_GET_MV_TOTAL];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_MV_TOTAL]];
             break;
             
         case HAMILTON_GET_MV_TOTAL:
@@ -305,7 +361,8 @@
             ventilation.MVTotal = strData;
             
             step = HAMILTON_GET_PEAK_PRESSURE;
-            cmd = [self getCommand:HAMILTON_GET_PEAK_PRESSURE];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_PEAK_PRESSURE]];
             break;
             
         case HAMILTON_GET_PEAK_PRESSURE:
@@ -315,7 +372,8 @@
             ventilation.PeakPressure = strData;
             
             step = HAMILTON_GET_PLATEAU_PRESSURE;
-            cmd = [self getCommand:HAMILTON_GET_PLATEAU_PRESSURE];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_PLATEAU_PRESSURE]];
             break;
             
         case HAMILTON_GET_PLATEAU_PRESSURE:
@@ -325,17 +383,21 @@
             ventilation.PlateauPressure = strData;
             
             step = HAMILTON_GET_MEAN_PRESSURE;
-            cmd = [self getCommand:HAMILTON_GET_MEAN_PRESSURE];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_MEAN_PRESSURE]];
             break;
             
         case HAMILTON_GET_MEAN_PRESSURE:
             /**
 			 * MeanPressure(67) return XXXX.
 			 */
-            ventilation.MeanPressure = strData;
+            if (mode != 4) {
+                ventilation.MeanPressure = strData;
+            }
             
             step = HAMILTON_GET_FIO2_MEAUSRE;
-            cmd = [self getCommand:HAMILTON_GET_FIO2_MEAUSRE];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_FIO2_MEAUSRE]];
             break;
             
         case HAMILTON_GET_FIO2_MEAUSRE:
@@ -345,7 +407,8 @@
             ventilation.FiO2Measured = strData;
             
             step = HAMILTON_GET_RESISTANCE;
-            cmd = [self getCommand:HAMILTON_GET_RESISTANCE];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_RESISTANCE]];
             break;
             
         case HAMILTON_GET_RESISTANCE:
@@ -355,7 +418,8 @@
             ventilation.Resistance = strData;
             
             step = HAMILTON_GET_COMPLIANCE;
-            cmd = [self getCommand:HAMILTON_GET_COMPLIANCE];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_COMPLIANCE]];
             break;
             
         case HAMILTON_GET_COMPLIANCE:
@@ -365,7 +429,8 @@
             ventilation.Compliance = strData;
             
             step = HAMILTON_GET_LOWER_MV;
-            cmd = [self getCommand:HAMILTON_GET_LOWER_MV];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_LOWER_MV]];
             break;
             
         case HAMILTON_GET_LOWER_MV:
@@ -375,7 +440,8 @@
             ventilation.LowerMV = strData;
             
             step = HAMILTON_GET_HIGH_PRESSURE_ALARM;
-            cmd = [self getCommand:HAMILTON_GET_HIGH_PRESSURE_ALARM];
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_HIGH_PRESSURE_ALARM]];
             break;
             
         case HAMILTON_GET_HIGH_PRESSURE_ALARM:
@@ -383,12 +449,14 @@
 			 * HighPressureAlarm(53) return XXXX.
 			 */
             ventilation.HighPressureAlarm = strData;
-            
+            ventilation.VentilationMode = [self getMode:ventilation.VentilationMode];
             step = HAMILTON_DONE;
+            [self resetMData];
             break;
             
         default:
             step = HAMILTON_ERROR;
+            [self resetMData];
             break;
     }
     
