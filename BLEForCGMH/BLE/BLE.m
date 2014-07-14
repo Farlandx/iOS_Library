@@ -361,6 +361,7 @@
         deviceType = DEVICE_TYPE_NONE;
         deviceInfo = nil;
         [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_DISCONNECTED];
+        isFindDevice = NO;
     }
 }
 
