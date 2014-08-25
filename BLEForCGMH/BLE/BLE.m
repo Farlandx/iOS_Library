@@ -19,7 +19,7 @@
 #define SERVICE_UUID @"49535343-FE7D-4AE5-8FA9-9FAFD205E455"
 #define NOTIFY_UUID @"49535343-1E4D-4BD9-BA61-23C647249616"
 #define WRITE_UUID @"49535343-8841-43F4-A8D4-ECBE34729BB3"
-#define TIME_OUT_INTERVAL 10.0f
+#define TIMEOUT_INTERVAL 10.0f
 
 #endif
 
@@ -41,6 +41,7 @@
         ventilation = [[VentilationData alloc] init];
         isFindDevice = NO;
         timeoutTimer = [[NSTimer alloc] init];
+        ble_version = [NSString stringWithFormat:@"BLE Library Version %@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
     }
     return self;
 }
@@ -285,7 +286,7 @@
         NSLog(@"SendData:%ld", [data length]);
         [_peripheral writeValue:data forCharacteristic:_writeCharacteristic type:CBCharacteristicWriteWithoutResponse];
         [timeoutTimer invalidate];
-        timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_OUT_INTERVAL target:self selector:@selector(timeroutThread) userInfo:nil repeats:NO];
+        timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:TIMEOUT_INTERVAL target:self selector:@selector(timeroutThread) userInfo:nil repeats:NO];
     }
     @catch (NSException *exception) {
         NSLog(@"SendData Exception: %@", exception);
@@ -322,13 +323,22 @@
 - (void)scanStop:(NSTimer*)timer {
     if (_centralMgr != nil){
         [_centralMgr stopScan];
-        [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_SCAN_TIMEOUT];
+        if (!isFindDevice) {
+            [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_SCAN_TIMEOUT];
+        }
     }else{
         NSLog(@"_centralMgr is Null!");
     }
 }
 
 #pragma mark - Methods
+- (NSString *)getVersion {
+    if (ble_version) {
+        return ble_version;
+    }
+    return @"";
+}
+
 //ConnectionString:BLE Name**DeviceType**MAC Address (Total 48 bytes)
 - (void)setConnectionString:(NSString *)connectionString {
     [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_CONNECTING];
@@ -337,6 +347,7 @@
 }
 
 - (void)startRead {
+    isFindDevice = NO;
     if (deviceInfo != nil) {
         if (!_centralMgr) {
             _centralMgr = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
@@ -361,7 +372,6 @@
         deviceType = DEVICE_TYPE_NONE;
         deviceInfo = nil;
         [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_DISCONNECTED];
-        isFindDevice = NO;
     }
 }
 

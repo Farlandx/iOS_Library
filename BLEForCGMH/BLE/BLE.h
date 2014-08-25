@@ -34,6 +34,7 @@ typedef NS_ENUM(NSUInteger, BleReadStatus) {
 @interface BLE : NSObject<CBCentralManagerDelegate, CBPeripheralDelegate> {
     DeviceInfo *deviceInfo;
     VentilationData *ventilation;
+    NSString *ble_version;
 }
 
 @property (assign, nonatomic) id<BleDelegate> delegate;
@@ -44,6 +45,7 @@ typedef NS_ENUM(NSUInteger, BleReadStatus) {
 @property (strong, nonatomic) NSMutableData *mData;
 
 #pragma -mark Methods
+- (NSString *)getVersion;
 - (void)setConnectionString:(NSString *)connectionString;
 - (void)startRead;
 - (void)disconnect;
