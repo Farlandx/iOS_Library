@@ -110,6 +110,28 @@ typedef NS_ENUM(NSInteger, VENTILATION_MODE) {
 @property (strong, nonatomic) NSString *AutoPEEP;
 @property (strong, nonatomic) NSString *PlateauTimeSetting;
 
+#pragma mark - 20140902新增欄位
+@property (strong, nonatomic) NSString *VentilationHertz;  //Hertz, XXX
+@property (strong, nonatomic) NSString *PH;  //PH (H下標),XXX
+@property (strong, nonatomic) NSString *PL;  //PL (L下標),XXX
+
+@property (strong, nonatomic) NSString *MinVol; //MinVol%,XXXX
+@property (strong, nonatomic) NSString *PressureAmplitude; //Amplitude,XXX
+@property (strong, nonatomic) NSString *TubeCompensation;//Tube Compensation%,XXXX
+@property (strong, nonatomic) NSString *VolumeAssist;//Volume Assist,XXX
+@property (strong, nonatomic) NSString *FlowAssist;//Flow Assist,XXX
+
+@property (strong, nonatomic) NSString *EdiPeak;//Edi Peak,XXX
+@property (strong, nonatomic) NSString *EdiMin;//Edi Min,XXX
+@property (strong, nonatomic) NSString *NavaLevel;//Nava Level,XXXX
+@property (strong, nonatomic) NSString *EdiTrigger;//Edi Trigger,XXX
+#pragma mark 原本欄位是NO，與關鍵字衝突，因此在前面加了底線
+@property (strong, nonatomic) NSString *_NO;//NO,XXX
+@property (strong, nonatomic) NSString *NO2;//NO2(2下標),XXXX
+
+@property (strong, nonatomic) NSString *LeakTest;//Cuff Leak Test,XXXXX
+#pragma mark -
+
 #pragma mark - 以下參數顯示用,不須上傳
 //治療師姓名
 @property (strong, nonatomic) NSString *RecordOperName;

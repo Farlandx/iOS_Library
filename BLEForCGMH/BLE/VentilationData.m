@@ -11,7 +11,7 @@
 @implementation VentilationData
 
 
-#pragma -mark Property
+#pragma mark - Property
 @synthesize MeasureId;
 @synthesize ChtNo;
 @synthesize RecordTime;
@@ -79,6 +79,28 @@
 @synthesize Xrem;
 @synthesize AutoPEEP;
 @synthesize PlateauTimeSetting;
+
+#pragma mark - 20140902新增欄位
+@synthesize VentilationHertz;  //Hertz, XXX
+@synthesize PH;  //PH (H下標),XXX
+@synthesize PL;  //PL (L下標),XXX
+
+@synthesize MinVol; //MinVol%,XXXX
+@synthesize PressureAmplitude; //Amplitude,XXX
+@synthesize TubeCompensation;//Tube Compensation%,XXXX
+@synthesize VolumeAssist;//Volume Assist,XXX
+@synthesize FlowAssist;//Flow Assist,XXX
+
+@synthesize EdiPeak;//Edi Peak,XXX
+@synthesize EdiMin;//Edi Min,XXX
+@synthesize NavaLevel;//Nava Level,XXXX
+@synthesize EdiTrigger;//Edi Trigger,XXX
+#pragma mark 原本欄位是NO，與關鍵字衝突，因此在前面加了底線
+@synthesize _NO;//NO,XXX
+@synthesize NO2;//NO2(2下標),XXXX
+
+@synthesize LeakTest;//Cuff Leak Test,XXXXX
+#pragma mark -
 
 //以下參數顯示用,不須上傳
 @synthesize RecordOperName;
@@ -224,8 +246,30 @@
     BedNo = @"";
     ErrorMsg = @"";
     checked = NO;
+    
+    //20140902新增欄位
+    VentilationHertz = @"";  //Hertz, XXX
+    PH = @"";  //PH (H下標),XXX
+    PL = @"";  //PL (L下標),XXX
+    
+    MinVol = @""; //MinVol%,XXXX
+    PressureAmplitude = @""; //Amplitude,XXX
+    TubeCompensation = @"";//Tube Compensation%,XXXX
+    VolumeAssist = @"";//Volume Assist,XXX
+    FlowAssist = @"";//Flow Assist,XXX
+    
+    EdiPeak = @"";//Edi Peak,XXX
+    EdiMin = @"";//Edi Min,XXX
+    NavaLevel = @"";//Nava Level,XXXX
+    EdiTrigger = @"";//Edi Trigger,XXX
+    
+    _NO = @"";//NO,XXX
+    NO2 = @"";//NO2(2下標),XXXX
+    
+    LeakTest = @"";//Cuff Leak Test,XXXXX
 }
 
+//清除量測資料
 - (void) clearVentilationData {
     RecordTime = @"";
     VentNo = @"";
