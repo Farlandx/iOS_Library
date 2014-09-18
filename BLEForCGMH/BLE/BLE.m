@@ -12,6 +12,7 @@
 #import "DRAGER.h"
 #import "Hamilton.h"
 #import "SERVOi.h"
+#import "PB840.h"
 
 #ifndef BLE_h
 #define BLE_h
@@ -179,6 +180,11 @@
                 break;
             }
                 
+            case DEVICE_TYPE_PB840: {
+                device = [[PB840 alloc] init];
+                
+            }
+                
             default:
                 break;
         }
@@ -264,6 +270,29 @@
                     break;
             }
             break;
+            
+        case DEVICE_TYPE_PB840: {
+            switch ([device run:characteristic.value VentilationData:ventilation]) {
+                case PB840_DONE:
+                    [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_DONE];
+                    
+                    [timeoutTimer invalidate];
+                    usleep(300000);
+                    [self disconnect];
+                    [device resetStep];
+                    break;
+                    
+                case PB840_ERROR:
+                    [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_ERROR];
+                    [timeoutTimer invalidate];
+                    [self disconnect];
+                    break;
+                    
+                default:
+                    break;
+            }
+            break;
+        }
             
         default:
             return;

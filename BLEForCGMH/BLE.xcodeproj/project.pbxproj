@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E4DD5D319C7CB2800120654 /* PB840.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E4DD5D219C7CB2800120654 /* PB840.m */; };
 		1E52A63C18C57297007AC38D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E52A63B18C57297007AC38D /* Foundation.framework */; };
 		1E52A64118C57297007AC38D /* BLE.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1E52A64018C57297007AC38D /* BLE.h */; };
 		1E52A64318C57297007AC38D /* BLE.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E52A64218C57297007AC38D /* BLE.m */; };
@@ -47,6 +48,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1E4DD5D119C7CB2800120654 /* PB840.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PB840.h; sourceTree = "<group>"; };
+		1E4DD5D219C7CB2800120654 /* PB840.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PB840.m; sourceTree = "<group>"; };
+		1E4DD5D419CA69F500120654 /* PB840_Commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PB840_Commands.h; sourceTree = "<group>"; };
 		1E52A63818C57297007AC38D /* libBLE.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBLE.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E52A63B18C57297007AC38D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1E52A63F18C57297007AC38D /* BLE-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BLE-Prefix.pch"; sourceTree = "<group>"; };
@@ -176,6 +180,8 @@
 				1EC7FA4418DC163A00C02121 /* DRAGER.m */,
 				1EC5674E18F386BF0098AF8D /* Hamilton.h */,
 				1EC5674F18F386BF0098AF8D /* Hamilton.m */,
+				1E4DD5D119C7CB2800120654 /* PB840.h */,
+				1E4DD5D219C7CB2800120654 /* PB840.m */,
 				1EC5675B18F63D100098AF8D /* SERVOi.h */,
 				1EC5675C18F63D100098AF8D /* SERVOi.m */,
 			);
@@ -188,6 +194,7 @@
 				1E56A7C518C584DE0092A759 /* DragerLibrary_Commands.h */,
 				1EC5675118F38EA60098AF8D /* HamiltonLibrary_Commands.h */,
 				1EC5675418F63C3E0098AF8D /* SERVOi_Commands.h */,
+				1E4DD5D419CA69F500120654 /* PB840_Commands.h */,
 			);
 			name = Commands;
 			sourceTree = "<group>";
@@ -285,6 +292,7 @@
 				1EC7FA4518DC163A00C02121 /* DRAGER.m in Sources */,
 				1EC5675018F386BF0098AF8D /* Hamilton.m in Sources */,
 				1E56A7CB18C586180092A759 /* DeviceInfo.m in Sources */,
+				1E4DD5D319C7CB2800120654 /* PB840.m in Sources */,
 				1EC5675D18F63D100098AF8D /* SERVOi.m in Sources */,
 				1E56A7C818C5852C0092A759 /* VentilationData.m in Sources */,
 				1E52A64318C57297007AC38D /* BLE.m in Sources */,
