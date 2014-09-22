@@ -358,7 +358,7 @@
 			 * 設定要讀取的數值(Measured) 1: 201 (TidalVolumeMeasured) 2: 200
 			 * (VentilationRateTotal) 3: 204 (MVTotal) 4: 205 (PeakPressure) 5:
 			 * 207 (PlateauPressure) 6: 206 (MeanPressure) 7: 209 (FiO2Measured)
-			 * 8: 241 (Compliance) 9: 233 (FlowMeasured)
+			 * 8: 241 (Compliance) 9: 233 (FlowMeasured) 10: 328 (FlowSensitivity)
 			 */
             step = SERVOI_SDADB;
             [self resetMData];
@@ -412,11 +412,14 @@
             // FiO2Measured(209)
             ventilation.FiO2Measured = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:7 value:measureds] intValue]]];
             
-            // Static Compliance(241)
+            // Dynamic Characteristics(241)
             //ventilation.Compliance = [self getValue:8 value:measureds];
             
             // FlowMeasured(233)
             //ventilation.FlowMeasured = [NSString stringWithFormat:@"%d", [[self getValue:9 value:measureds] intValue]];
+            
+            // FlowSensitivity(328)
+            //ventilation.FlowSensitivity = [NSString stringWithFormat:@"%d", [[self getValue:9 value:measureds] intValue]];
             
             ventilation.VentilationMode = [self getVentilationMode:ventilation.VentilationMode];
             

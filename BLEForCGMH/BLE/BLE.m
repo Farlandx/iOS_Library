@@ -323,7 +323,7 @@
 }
 
 - (DeviceInfo *)getDeviceInfoByCode:(NSString *)code {
-    DeviceInfo *di = [DeviceInfo alloc];
+    DeviceInfo *di = [[DeviceInfo alloc] init];
     
     if (code == nil || [code isEqualToString:@""] || [code rangeOfString:@"**"].location == NSNotFound) {
         //code和型號一定要有，否則回傳nil，mac_address不影響連線則不管他
