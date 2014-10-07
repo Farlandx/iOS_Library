@@ -11,7 +11,7 @@
 
 #define _STX 0x02
 #define _ETX 0x03
-#define _CR  0x13
+#define _CR  0x0D
 
 #define FIRST_COMMAND @"SNDF"
 #define SECOND_COMMAND @"SNDA"

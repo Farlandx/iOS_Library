@@ -22,6 +22,7 @@
 		1EC5675018F386BF0098AF8D /* Hamilton.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EC5674F18F386BF0098AF8D /* Hamilton.m */; };
 		1EC5675D18F63D100098AF8D /* SERVOi.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EC5675C18F63D100098AF8D /* SERVOi.m */; };
 		1EC7FA4518DC163A00C02121 /* DRAGER.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EC7FA4418DC163A00C02121 /* DRAGER.m */; };
+		1EC8C24C19E374F300808FF9 /* SERVO300.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EC8C24B19E374F300808FF9 /* SERVO300.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +77,8 @@
 		1EC5675C18F63D100098AF8D /* SERVOi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SERVOi.m; sourceTree = "<group>"; };
 		1EC7FA4318DC163A00C02121 /* DRAGER.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DRAGER.h; sourceTree = "<group>"; };
 		1EC7FA4418DC163A00C02121 /* DRAGER.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DRAGER.m; sourceTree = "<group>"; };
+		1EC8C24A19E374F300808FF9 /* SERVO300.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SERVO300.h; sourceTree = "<group>"; };
+		1EC8C24B19E374F300808FF9 /* SERVO300.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SERVO300.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +187,8 @@
 				1E4DD5D219C7CB2800120654 /* PB840.m */,
 				1EC5675B18F63D100098AF8D /* SERVOi.h */,
 				1EC5675C18F63D100098AF8D /* SERVOi.m */,
+				1EC8C24A19E374F300808FF9 /* SERVO300.h */,
+				1EC8C24B19E374F300808FF9 /* SERVO300.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -296,6 +301,7 @@
 				1EC5675D18F63D100098AF8D /* SERVOi.m in Sources */,
 				1E56A7C818C5852C0092A759 /* VentilationData.m in Sources */,
 				1E52A64318C57297007AC38D /* BLE.m in Sources */,
+				1EC8C24C19E374F300808FF9 /* SERVO300.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

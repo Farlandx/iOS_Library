@@ -28,6 +28,9 @@
         else if (![DeviceType caseInsensitiveCompare:@"SERVOI"]) {
             self.DeviceType = DEVICE_TYPE_SERVOI;
         }
+        else if (![DeviceType caseInsensitiveCompare:@"PB840"]) {
+            self.DeviceType = DEVICE_TYPE_PB840;
+        }
         else if (![DeviceType caseInsensitiveCompare:@"NONE"]) {
             self.DeviceType = DEVICE_TYPE_NONE;
         }

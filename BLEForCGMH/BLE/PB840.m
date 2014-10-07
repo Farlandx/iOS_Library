@@ -21,7 +21,7 @@
     if (self = [super init]) {
 //        STX = [@"\x02" dataUsingEncoding:NSUTF8StringEncoding];
 //        ETX = [@"\x03" dataUsingEncoding:NSUTF8StringEncoding];
-        CR = [@"\x13" dataUsingEncoding:NSUTF8StringEncoding];
+        CR = [@"\x0D" dataUsingEncoding:NSUTF8StringEncoding];
         step = PB840_FIRST_COMMAND;
         mData = [[NSMutableData alloc] init];
     }
@@ -45,7 +45,7 @@
             canRead = YES;
             break;
         }
-        [mData appendBytes:(const void *)buffer[i] length:1];
+        [mData appendBytes:&buffer[i] length:1];
     }
 //    [mData appendData:data];
     if (canRead) {
@@ -61,6 +61,7 @@
                     step = PB840_SECOND_COMMAND;
                     return step;
                 }
+                break;
             }
             case PB840_SECOND_COMMAND: {
                 if ([((NSString *)resultArray[0]) caseInsensitiveCompare:@"MISCA"] != NSOrderedSame) {
@@ -202,8 +203,12 @@
     step = PB840_FIRST_COMMAND;
 }
 
-- (NSString *)getFirstCommand {
-    return FIRST_COMMAND;
+- (NSData *)getFirstCommand {
+    return [self getCommand:FIRST_COMMAND];
+}
+
+- (NSData *)getSecondCommand {
+    return [self getCommand:SECOND_COMMAND];
 }
 
 #pragma mark - Private Method
@@ -216,19 +221,24 @@
 - (NSData *)getCommand:(NSString *)cmd {
     NSData *result = [[NSData alloc] init];
     
-    NSData *cmdByte = [cmd dataUsingEncoding:NSASCIIStringEncoding];
+    NSData *cmdByte = [cmd dataUsingEncoding:NSUTF8StringEncoding];
     NSMutableData *sendByte = [[NSMutableData alloc] init];
     [sendByte appendData:cmdByte];
     [sendByte appendData:CR];
+    result = sendByte;
     
     return result;
 }
 
 - (NSString *)getValue:(NSArray *)data position:(int)position {
-    if (data.count < 5) {
+    if (data.count < 2) {
         return @"";
     }
-    return [((NSString *)data[position - 5]) stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSString *tmpString = [((NSString *)data[position - 2]) stringByReplacingOccurrencesOfString:@" " withString:@""];
+    if ([tmpString intValue] && [tmpString intValue] == 0) {
+        return @"";
+    }
+    return tmpString;
 }
 
 #pragma mark MISCA

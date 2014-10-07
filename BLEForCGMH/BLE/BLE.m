@@ -12,6 +12,7 @@
 #import "DRAGER.h"
 #import "Hamilton.h"
 #import "SERVOi.h"
+#import "SERVO300.h"
 #import "PB840.h"
 
 #ifndef BLE_h
@@ -24,7 +25,7 @@
 
 #endif
 
-@interface BLE ()<DRAGER_Delegate, Hamilton_Delegate, SERVOi_Delegate>
+@interface BLE ()<DRAGER_Delegate, Hamilton_Delegate, SERVOi_Delegate, SERVO300_Delegate, PB840_Delegate>
 
 @end
 
@@ -180,9 +181,22 @@
                 break;
             }
                 
+            case DEVICE_TYPE_SERVO300: {
+                device = [[SERVO300 alloc] init];
+                ((SERVO300 *)device).delegate = self;
+                NSData *cmdInit = [device getInitCommand];
+                [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_READING_DATA];
+                [self sendData:cmdInit];
+                break;
+            }
+                
             case DEVICE_TYPE_PB840: {
                 device = [[PB840 alloc] init];
-                
+                ((PB840 *)device).delegate = self;
+                NSData *cmdFirst = [device getFirstCommand];
+                [_delegate recievedVentilationDataAndReadStatus:nil readStatus:BLE_READING_DATA];
+                [self sendData:cmdFirst];
+                break;
             }
                 
             default:
@@ -271,8 +285,36 @@
             }
             break;
             
+        case DEVICE_TYPE_SERVO300:
+            switch ([device run:characteristic.value VentilationData:ventilation]) {
+                case SERVO300_DONE:
+                    [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_DONE];
+                    
+                    [timeoutTimer invalidate];
+                    usleep(300000);
+                    [self disconnect];
+                    [device resetStep];
+                    break;
+                    
+                case SERVO300_ERROR:
+                    [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_ERROR];
+                    [timeoutTimer invalidate];
+                    [self disconnect];
+                    break;
+                    
+                default:
+                    break;
+            }
+            break;
+            
         case DEVICE_TYPE_PB840: {
             switch ([device run:characteristic.value VentilationData:ventilation]) {
+                case PB840_SECOND_COMMAND: {
+                    NSData *cmd = [device getSecondCommand];
+                    [self sendData:cmd];
+                    break;
+                }
+                    
                 case PB840_DONE:
                     [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_DONE];
                     

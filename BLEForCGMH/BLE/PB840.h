@@ -31,6 +31,7 @@ typedef NS_ENUM(NSUInteger, PB840_READ_STEP) {
 
 - (PB840_READ_STEP)run:(NSData *)data VentilationData:(VentilationData *)ventilation;
 - (void)resetStep;
-- (NSString *)getFirstCommand;
+- (NSData *)getFirstCommand;
+- (NSData *)getSecondCommand;
 
 @end
