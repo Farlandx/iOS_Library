@@ -418,6 +418,9 @@
             
             // FiO2Measured(209)
             ventilation.FiO2Measured = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:7 value:measureds] intValue]]];
+            if (![ventilation.FiO2Measured isEqualToString:@""]) {
+                ventilation.FiO2Measured = [self stringZeroFilter:[NSString stringWithFormat:@"%.0f", [ventilation.FiO2Measured floatValue] / 10.0f]];
+            }
             
             // Dynamic Characteristics(241)
             //ventilation.Compliance = [self getValue:8 value:measureds];

@@ -36,6 +36,7 @@
 
 - (NSString *)getVentilationMode:(NSString *)mode {
     switch ([mode intValue]) {
+            //automode OFF
         case 1:
             return @"Value not used";
         case 2:
@@ -47,9 +48,9 @@
         case 5:
             return @"Volume Support";
         case 6:
-            return @"SIMV + Pressure Support";
+            return @"SIMV(VC) + Pressure Support";
         case 7:
-            return @"SIMV + Pressure Support";
+            return @"SIMV(PC) + Pressure Support";
         case 8:
             return @"Pressure Support / CPAP";
         case 9:
@@ -70,6 +71,7 @@
             return @"Value not used";
         case 17:
             return @"NIV NAVA";
+            //automode ON
         case 18:
             return @"Pressure Control";
         case 19:
@@ -224,7 +226,7 @@
              * 設定要讀取的數值(Setting)1: 310 (VentilationMode)
              * 2: 300 (VentilationRateSet)3: 305 (MVSet)4: 306 (PressureControl)5: 307 (PressureSupport)
              * 6: 323 (FiO2Set)7: 314 (LowerMV)8: 315 (HighPressureAlarm)9: 308 (PEEP) (Plow when mode=11)
-             * 10: 303 (SIMVRateSet)
+             * 10: 303 (SIMVRateSet)11: 301 (Insp.T)
              */
             step = SERVO300_SDADS;
             [self resetMData];
@@ -247,20 +249,34 @@
             
             // VentilationRateSet(300)
             ventilation.VentilationRateSet = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:2 value:settings] intValue]]];
-            if (![ventilation.VentilationRateSet isEqualToString:@""]) {
+            if ([ventilation.VentilationMode intValue] == 8) { //Pressure Support
+                ventilation.VentilationRateSet = @"";
+            }
+            else if (![ventilation.VentilationRateSet isEqualToString:@""]) {
                 ventilation.VentilationRateSet = [self stringZeroFilter:[NSString stringWithFormat:@"%.0f", [ventilation.VentilationRateSet floatValue] / 10.0f]];
                 
             }
             
             // MVSet(305)
+            NSLog(@"mode:%@",ventilation.VentilationMode);
             ventilation.MVSet = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:3 value:settings] intValue]]];
-            if (![ventilation.MVSet isEqualToString:@""]) {
+            if ([ventilation.VentilationMode intValue] == 6 || [ventilation.VentilationMode intValue] == 7 || //SIMV(PC) + Pressure Support
+                [ventilation.VentilationMode intValue] == 8 || //Pressure Support
+                [ventilation.VentilationMode intValue] == 2 || [ventilation.VentilationMode intValue] == 18 || //Pressure Control
+                [ventilation.VentilationMode intValue] == 3 || [ventilation.VentilationMode intValue] == 19) { //Volume Control
+                ventilation.MVSet = @"";
+            }
+            else if (![ventilation.MVSet isEqualToString:@""]) {
                 ventilation.MVSet = [self stringZeroFilter:[NSString stringWithFormat:@"%.1lf", [ventilation.MVSet floatValue] / 100.0f]];
             }
             
             // PressureControl(306)
             ventilation.PressureControl = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:4 value:settings] intValue]]];
-            if (![ventilation.PressureControl isEqualToString:@""]) {
+            if ([ventilation.VentilationMode intValue] == 8 || //Pressure Support
+                [ventilation.VentilationMode intValue] == 3 || [ventilation.VentilationMode intValue] == 19) { //Volume Control
+                ventilation.PressureControl = @"";
+            }
+            else if (![ventilation.PressureControl isEqualToString:@""]) {
                 ventilation.PressureControl = [self stringZeroFilter:[NSString stringWithFormat:@"%.0f", [ventilation.PressureControl floatValue] / 10.0f]];
             }
             
@@ -287,7 +303,12 @@
             
             // SIMVRateSet(303)
             ventilation.SIMVRateSet = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:10 value:settings] intValue]]];
-            if (![ventilation.SIMVRateSet isEqualToString:@""]) {
+            if ([ventilation.VentilationMode intValue] == 8 || //Pressure Support
+                [ventilation.VentilationMode intValue] == 2 || [ventilation.VentilationMode intValue] == 18 || //Pressure Control
+                [ventilation.VentilationMode intValue] == 3 || [ventilation.VentilationMode intValue] == 19) { //Volume Control
+                ventilation.SIMVRateSet = @"";
+            }
+            else if (![ventilation.SIMVRateSet isEqualToString:@""]) {
                 ventilation.SIMVRateSet = [self stringZeroFilter:[NSString stringWithFormat:@"%.0f", [ventilation.SIMVRateSet floatValue] / 10.0f]];
             }
             
@@ -301,8 +322,21 @@
                 ventilation.PressureSupport = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:5 value:settings] intValue]]];
             }
             
-            if (![ventilation.PressureSupport isEqualToString:@""]) {
+            if ([ventilation.VentilationMode intValue] == 2 || [ventilation.VentilationMode intValue] == 18 || //Pressure Control
+                [ventilation.VentilationMode intValue] == 3 || [ventilation.VentilationMode intValue] == 19) { //Volume Control
+                ventilation.PressureSupport = @"";
+            }
+            else if (![ventilation.PressureSupport isEqualToString:@""]) {
                 ventilation.PressureSupport = [self stringZeroFilter:[NSString stringWithFormat:@"%.1lf", [ventilation.PressureSupport floatValue] / 10.0f]];
+            }
+            
+            // Insp. T(301)
+            ventilation.InspT = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:11 value:settings] intValue]]];
+            if ([ventilation.VentilationMode intValue] == 8) { //Pressure Support
+                ventilation.InspT = @"";
+            }
+            else if (![ventilation.InspT isEqualToString:@""]) {
+                ventilation.InspT = [self stringZeroFilter:[NSString stringWithFormat:@"%.1lf", [ventilation.InspT floatValue] / 10.0f]];
             }
             
             /*
@@ -349,7 +383,12 @@
             
             // PlateauPressure(207)
             ventilation.PlateauPressure = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:5 value:measureds] intValue]]];
-            if (![ventilation.PlateauPressure isEqualToString:@""]) {
+            if ([ventilation.VentilationMode intValue] == 8 || //Pressure Support
+                [ventilation.VentilationMode intValue] == 7 || //SIMV(PC) + Pressure Support
+                [ventilation.VentilationMode intValue] == 2 || [ventilation.VentilationMode intValue] == 18) { //Pressure Control
+                ventilation.PlateauPressure = @"";
+            }
+            else if (![ventilation.PlateauPressure isEqualToString:@""]) {
                 ventilation.PlateauPressure = [self stringZeroFilter:[NSString stringWithFormat:@"%.0f", [ventilation.PlateauPressure floatValue] / 10.0f]];
             }
             
@@ -360,9 +399,14 @@
             }
             
             // FiO2Measured(209)
-            ventilation.FiO2Measured = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:7 value:measureds] intValue]]];
+//            if ([ventilation.VentilationMode intValue] == 6 || [ventilation.VentilationMode intValue] == 7) { //SIMV + Pressure Support
+//                ventilation.FiO2Measured = @"";
+//            }
+//            else {
+//                ventilation.FiO2Measured = [self stringZeroFilter:[NSString stringWithFormat:@"%d", [[self getValue:7 value:measureds] intValue]]];
+//            }
             
-            ventilation.InspT = [self stringZeroFilter:[NSString stringWithFormat:@"%.1f", [ventilation.MeanPressure floatValue] / 10.0f]];
+//            ventilation.InspT = [self stringZeroFilter:[NSString stringWithFormat:@"%.1f", [ventilation.MeanPressure floatValue] / 10.0f]];
             
             ventilation.VentilationMode = [self getVentilationMode:ventilation.VentilationMode];
             

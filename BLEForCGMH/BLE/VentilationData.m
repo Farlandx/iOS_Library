@@ -92,6 +92,11 @@
 @synthesize EdiMin;//Edi Min,XXX
 @synthesize NavaLevel;//Nava Level,XXXX
 @synthesize EdiTrigger;//Edi Trigger,XXX
+
+#pragma mark - 20141023新增欄位
+@synthesize MaxPe;
+@synthesize Vc;
+
 #pragma mark 原本欄位是NO，與關鍵字衝突，因此在前面加了底線
 @synthesize _NO;//NO,XXX
 @synthesize NO2;//NO2(2下標),XXXX
@@ -261,6 +266,10 @@
     NO2 = @"";//NO2(2下標),XXXX
     
     LeakTest = @"";//Cuff Leak Test,XXXXX
+    
+    //20141023新增欄位
+    MaxPe = @"";
+    Vc = @"";
 }
 
 //清除量測資料

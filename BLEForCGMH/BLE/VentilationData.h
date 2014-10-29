@@ -96,7 +96,7 @@ typedef NS_ENUM(NSInteger, VENTILATION_MODE) {
 @property (strong, nonatomic) NSString *TV;
 @property (strong, nonatomic) NSString *MV;
 @property (strong, nonatomic) NSString *MaxPi;
-@property (strong, nonatomic) NSString *Mvv;
+@property (strong, nonatomic) NSString *MaxPe;
 @property (strong, nonatomic) NSString *Rsbi;
 @property (strong, nonatomic) NSString *EtSize;
 @property (strong, nonatomic) NSString *Mark;
@@ -127,7 +127,10 @@ typedef NS_ENUM(NSInteger, VENTILATION_MODE) {
 @property (strong, nonatomic) NSString *NO2;//NO2(2下標),XXXX
 
 @property (strong, nonatomic) NSString *LeakTest;//Cuff Leak Test,XXXXX
-#pragma mark -
+
+#pragma mark - 20141023新增欄位
+@property (strong, nonatomic) NSString *Mvv;
+@property (strong, nonatomic) NSString *Vc;
 
 #pragma mark - 以下參數顯示用,不須上傳
 //治療師姓名

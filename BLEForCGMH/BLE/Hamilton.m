@@ -9,10 +9,17 @@
 #import "Hamilton.h"
 #import "HamiltonLibrary_Commands.h"
 
+typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
+    Unknow,
+    Galileo,
+    Raphael
+};
+
 @implementation Hamilton {
     HAMILTON_READ_STEP step;
     int mode;
     NSMutableData *mData;
+    DEVICE_TYPE deviceType;
 }
 
 - (id)init {
@@ -21,6 +28,7 @@
         step = HAMILTON_GET_VENTILATION_MODE;
         mode = -1;
         mData = [[NSMutableData alloc] init];
+        deviceType = Unknow;
     }
     return self;
 }
@@ -148,6 +156,23 @@
             mode = [strData intValue];
             ventilation.VentilationMode = [NSString stringWithFormat:@"%d", mode];
             
+            step = HAMILTON_GET_SOFTWARE_VERSION;
+            [self resetMData];
+            [_delegate nextCommand:[self getCommand:HAMILTON_GET_SOFTWARE_VERSION]];
+            break;
+            
+        case HAMILTON_GET_SOFTWARE_VERSION:
+            /**
+             * Software Version(124)
+             * Galileo : A5xxxx
+             * Raphael : A7xxxx
+             */
+            if ([[strData substringToIndex:2] isEqualToString:@"A5"]) {
+                deviceType = Galileo;
+            }
+            else if ([[strData substringToIndex:2] isEqualToString:@"A7"]) {
+                deviceType = Raphael;
+            }
             step = HAMILTON_GET_VENTILATION_RATE_SET;
             [self resetMData];
             [_delegate nextCommand:[self getCommand:HAMILTON_GET_VENTILATION_RATE_SET]];
@@ -303,9 +328,16 @@
                 ventilation.PHigh = strData;
             }
             
-            step = HAMILTON_GET_FLOW_SETTING;
             [self resetMData];
-            [_delegate nextCommand:[self getCommand:HAMILTON_GET_FLOW_SETTING]];
+            
+            if (deviceType == Galileo) {
+                step = HAMILTON_GET_FLOW_SETTING;
+                [_delegate nextCommand:[self getCommand:HAMILTON_GET_FLOW_SETTING]];
+            }
+            else {
+                step = HAMILTON_GET_TIDAL_VOLUME_MEASURED;
+                [_delegate nextCommand:[self getCommand:HAMILTON_GET_TIDAL_VOLUME_MEASURED]];
+            }
             break;
             
         case HAMILTON_GET_FLOW_SETTING:
@@ -371,9 +403,16 @@
 			 */
             ventilation.PeakPressure = strData;
             
-            step = HAMILTON_GET_PLATEAU_PRESSURE;
             [self resetMData];
-            [_delegate nextCommand:[self getCommand:HAMILTON_GET_PLATEAU_PRESSURE]];
+            
+            if (deviceType == Galileo) {
+                step = HAMILTON_GET_PLATEAU_PRESSURE;
+                [_delegate nextCommand:[self getCommand:HAMILTON_GET_PLATEAU_PRESSURE]];
+            }
+            else {
+                step = HAMILTON_GET_MEAN_PRESSURE;
+                [_delegate nextCommand:[self getCommand:HAMILTON_GET_MEAN_PRESSURE]];
+            }
             break;
             
         case HAMILTON_GET_PLATEAU_PRESSURE:
@@ -406,9 +445,16 @@
 			 */
             ventilation.FiO2Measured = strData;
             
-            step = HAMILTON_GET_RESISTANCE;
             [self resetMData];
-            [_delegate nextCommand:[self getCommand:HAMILTON_GET_RESISTANCE]];
+            
+            if (deviceType == Galileo) {
+                step = HAMILTON_GET_RESISTANCE;
+                [_delegate nextCommand:[self getCommand:HAMILTON_GET_RESISTANCE]];
+            }
+            else {
+                step = HAMILTON_GET_COMPLIANCE;
+                [_delegate nextCommand:[self getCommand:HAMILTON_GET_COMPLIANCE]];
+            }
             break;
             
         case HAMILTON_GET_RESISTANCE:
