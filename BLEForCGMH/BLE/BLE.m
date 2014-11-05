@@ -153,6 +153,8 @@
     
     if (_peripheral.state != CBPeripheralStateDisconnected && _notifyCharacteristic != nil && _writeCharacteristic != nil) {
         deviceType = deviceInfo.DeviceType;
+        //睡個50ms聽說可以防止第一次收不到資料的問題？
+        usleep(500000);
         switch (deviceType) {
             case DEVICE_TYPE_DRAGER: {
                 device = [[DRAGER alloc] init];
