@@ -130,7 +130,7 @@ typedef NS_ENUM(NSInteger, VENTILATION_MODE) {
 
 #pragma mark - 20141023新增欄位
 @property (strong, nonatomic) NSString *Mvv;
-@property (strong, nonatomic) NSString *Vc;
+@property (strong, nonatomic) NSString *VC;
 
 #pragma mark - 以下參數顯示用,不須上傳
 //治療師姓名
