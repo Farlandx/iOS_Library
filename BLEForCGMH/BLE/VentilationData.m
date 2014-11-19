@@ -93,18 +93,30 @@
 @synthesize NavaLevel;//Nava Level,XXXX
 @synthesize EdiTrigger;//Edi Trigger,XXX
 
-#pragma mark - 20141023新增欄位
-@synthesize MaxPe;
-@synthesize VC;
-
 #pragma mark 原本欄位是NO，與關鍵字衝突，因此在前面加了底線
 @synthesize _NO;//NO,XXX
 @synthesize NO2;//NO2(2下標),XXXX
 
 @synthesize LeakTest;//Cuff Leak Test,XXXXX
-#pragma mark -
 
-//以下參數顯示用,不須上傳
+#pragma mark - 20141023新增欄位
+@synthesize MaxPe;
+@synthesize VC;
+#pragma mark ABG
+@synthesize Be;
+@synthesize HCO3;
+@synthesize PAAO2;
+@synthesize PaCo2;
+@synthesize PaO2;
+@synthesize PfRatio;
+@synthesize Ph;
+@synthesize SaO2;
+@synthesize Shunt;
+@synthesize Site;
+#pragma mark 20141113新增欄位
+@synthesize AnalysisTime;
+
+#pragma mark - 以下屬性顯示用,不須上傳
 @synthesize RecordOperName;
 @synthesize VentilatorModel;
 @synthesize BedNo;
@@ -270,6 +282,18 @@
     //20141023新增欄位
     MaxPe = @"";
     VC = @"";
+    Be = @"";
+    HCO3 = @"";
+    PAAO2 = @"";
+    PaCo2 = @"";
+    PaO2 = @"";
+    PfRatio = @"";
+    Ph = @"";
+    SaO2 = @"";
+    Shunt = @"";
+    Site = @"";
+    //20141113新增欄位
+    AnalysisTime = @"";
 }
 
 //清除量測資料

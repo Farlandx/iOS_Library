@@ -90,8 +90,6 @@ typedef NS_ENUM(NSInteger, VENTILATION_MODE) {
 @property (strong, nonatomic) NSString *HighPressureAlarm;
 @property (strong, nonatomic) NSString *Temperature;
 @property (strong, nonatomic) NSString *ReliefPressure;
-@property (strong, nonatomic) NSString *PetCo2;
-@property (strong, nonatomic) NSString *SpO2;
 @property (strong, nonatomic) NSString *RR;
 @property (strong, nonatomic) NSString *TV;
 @property (strong, nonatomic) NSString *MV;
@@ -109,6 +107,23 @@ typedef NS_ENUM(NSInteger, VENTILATION_MODE) {
 @property (strong, nonatomic) NSString *Xrem;
 @property (strong, nonatomic) NSString *AutoPEEP;
 @property (strong, nonatomic) NSString *PlateauTimeSetting;
+
+#pragma mark - ABG
+@property (strong, nonatomic) NSString *PetCo2;
+@property (strong, nonatomic) NSString *SpO2;
+#pragma mark 20141023新增欄位
+@property (strong, nonatomic) NSString *Be;
+@property (strong, nonatomic) NSString *HCO3;
+@property (strong, nonatomic) NSString *PAAO2;
+@property (strong, nonatomic) NSString *PaCo2;
+@property (strong, nonatomic) NSString *PaO2;
+@property (strong, nonatomic) NSString *PfRatio;
+@property (strong, nonatomic) NSString *Ph;
+@property (strong, nonatomic) NSString *SaO2;
+@property (strong, nonatomic) NSString *Shunt;
+@property (strong, nonatomic) NSString *Site;
+#pragma mark 20141114新增欄位
+@property (strong, nonatomic) NSString *AnalysisTime;
 
 #pragma mark - 20140902新增欄位
 @property (strong, nonatomic) NSString *VentilationHertz;  //Hertz, XXX
