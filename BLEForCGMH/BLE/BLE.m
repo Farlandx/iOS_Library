@@ -22,6 +22,7 @@
 #define NOTIFY_UUID @"49535343-1E4D-4BD9-BA61-23C647249616"
 #define WRITE_UUID @"49535343-8841-43F4-A8D4-ECBE34729BB3"
 #define TIMEOUT_INTERVAL 10.0f
+#define BLE_MTU 20
 
 #endif
 
@@ -123,7 +124,7 @@
     }
 }
 
--(void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
+- (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
     for (CBCharacteristic *characteristic in service.characteristics) {
         if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:NOTIFY_UUID]]) {
@@ -356,8 +357,21 @@
 
 - (void)sendData:(NSData *)data {
     @try {
-        NSLog(@"SendData:%ld", [data length]);
-        [_peripheral writeValue:data forCharacteristic:_writeCharacteristic type:CBCharacteristicWriteWithoutResponse];
+        int dataLength = (int)[data length];
+        NSLog(@"SendData:%d", dataLength);
+        
+        if (dataLength > BLE_MTU) {
+            int count = 0;
+            while (count < dataLength && dataLength - count > BLE_MTU) {
+                [_peripheral writeValue:[data subdataWithRange:NSMakeRange(count, BLE_MTU)] forCharacteristic:_writeCharacteristic type:CBCharacteristicWriteWithoutResponse];
+                [NSThread sleepForTimeInterval:0.005];
+                count += BLE_MTU;
+            }
+        }
+        else {
+            [_peripheral writeValue:data forCharacteristic:_writeCharacteristic type:CBCharacteristicWriteWithoutResponse];
+        }
+        
         [timeoutTimer invalidate];
         timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:TIMEOUT_INTERVAL target:self selector:@selector(timeroutThread) userInfo:nil repeats:NO];
     }
