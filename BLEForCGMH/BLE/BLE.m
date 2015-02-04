@@ -154,8 +154,7 @@
     
     if (_peripheral.state != CBPeripheralStateDisconnected && _notifyCharacteristic != nil && _writeCharacteristic != nil) {
         deviceType = deviceInfo.DeviceType;
-        //睡個50ms聽說可以防止第一次收不到資料的問題？
-        usleep(500000);
+        
         switch (deviceType) {
             case DEVICE_TYPE_DRAGER: {
                 device = [[DRAGER alloc] init];
@@ -243,9 +242,16 @@
             }
             break;
             
-        case DEVICE_TYPE_HAMILTON:
+        case DEVICE_TYPE_HAMILTON: { //7 bit
             //傳值給HAMILTON
-            switch ([device run:characteristic.value VentilationData:ventilation]) {
+            const unsigned char *c = [characteristic.value bytes];
+            NSMutableData *buffer = [[NSMutableData alloc] init];
+            NSLog(@"len:%ld", characteristic.value.length);
+            for (int i = 0; i < characteristic.value.length; i++) {
+                unsigned char x[1] = { c[i] > 127 ? c[i] - 128 : c[i]};
+                [buffer appendBytes:x length:1];
+            }
+            switch ([device run:buffer VentilationData:ventilation]) {
                 case HAMILTON_DONE:
                     [_delegate recievedVentilationDataAndReadStatus:ventilation readStatus:BLE_READ_DONE];
                     
@@ -265,7 +271,8 @@
                     break;
             }
             break;
-            
+        }
+    
         case DEVICE_TYPE_SERVOI:
             switch ([device run:characteristic.value VentilationData:ventilation]) {
                 case SERVOI_DONE:
