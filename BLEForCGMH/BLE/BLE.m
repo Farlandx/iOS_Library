@@ -18,9 +18,14 @@
 #ifndef BLE_h
 #define BLE_h
 
-#define SERVICE_UUID @"49535343-FE7D-4AE5-8FA9-9FAFD205E455"
-#define NOTIFY_UUID @"49535343-1E4D-4BD9-BA61-23C647249616"
-#define WRITE_UUID @"49535343-8841-43F4-A8D4-ECBE34729BB3"
+//#define SERVICE_UUID @"49535343-FE7D-4AE5-8FA9-9FAFD205E455"
+//#define NOTIFY_UUID @"49535343-1E4D-4BD9-BA61-23C647249616"
+//#define WRITE_UUID @"49535343-8841-43F4-A8D4-ECBE34729BB3"
+#define SERVICE_UUID @"FFF0"
+#define DEVICE_SETTING @"FFF1"
+#define NOTIFY_UUID @"FFF2"
+#define WRITE_UUID @"FFF3"
+#define BATTERY_INFO_UUID @"180F"
 #define TIMEOUT_INTERVAL 10.0f
 #define BLE_MTU 20
 
@@ -368,15 +373,24 @@
         NSLog(@"SendData:%d", dataLength);
         
         if (dataLength > BLE_MTU) {
-            int count = 0;
-            while (count < dataLength && dataLength - count > BLE_MTU) {
-                [_peripheral writeValue:[data subdataWithRange:NSMakeRange(count, BLE_MTU)] forCharacteristic:_writeCharacteristic type:CBCharacteristicWriteWithoutResponse];
-                [NSThread sleepForTimeInterval:0.005];
-                count += BLE_MTU;
+            const char *bytes = [data bytes];
+            int dataLength = (int)[data length];
+            int offset = 0;
+            while (offset < dataLength) {
+                int size = (dataLength - offset);
+                if (size > BLE_MTU) {
+                    size = BLE_MTU;
+                }
+                
+                NSData *buffer = [NSData dataWithBytes:bytes + offset length:size];
+                [_peripheral writeValue:buffer forCharacteristic:_writeCharacteristic type:CBCharacteristicWriteWithResponse];
+                
+                offset += size;
+                usleep(30000);
             }
         }
         else {
-            [_peripheral writeValue:data forCharacteristic:_writeCharacteristic type:CBCharacteristicWriteWithoutResponse];
+            [_peripheral writeValue:data forCharacteristic:_writeCharacteristic type:CBCharacteristicWriteWithResponse];
         }
         
         [timeoutTimer invalidate];
