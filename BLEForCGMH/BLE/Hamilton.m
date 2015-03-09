@@ -45,8 +45,29 @@ typedef NS_ENUM(NSUInteger, DEVICE_TYPE) {
     }
 }
 
+- (int)getEvenByte:(int)x {
+    int count = 0;
+    for (int i = 1; i <= 128; i = i << 1) {
+        if (i & x) {
+            count++;
+        }
+    }
+    
+    if (count % 2) {
+        x += 128;
+    }
+    
+    return x;
+    
+}
+
 - (NSData *)getCommand:(int)cmd {
-    unsigned char result[4] = {STX, cmd, ETX, CR};
+    unsigned char result[4] = {
+        [self getEvenByte:STX],
+        [self getEvenByte:cmd],
+        [self getEvenByte:ETX],
+        [self getEvenByte:CR]
+    };
     return [[NSData alloc] initWithBytes:result length:4];
 }
 
